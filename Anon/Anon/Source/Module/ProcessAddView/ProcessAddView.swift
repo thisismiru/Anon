@@ -48,8 +48,12 @@ enum OnboardingStep: Int, CaseIterable {
 
 // 2) 컨테이너
 struct ProcessAddView: View {
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var container: DIContainer
     @State private var step: OnboardingStep = .workType
+    
+    @State private var task: ConstructionTask?
+    let taskId: String?
     
     
     // ✅ SwiftData 컨텍스트
@@ -62,7 +66,7 @@ struct ProcessAddView: View {
     @State private var progress: Int = 0
     @State private var headcount: Int? = nil
     @State private var startTime: Date = .now
-    
+      
     var canNext: Bool {
         switch step {
         case .workType:    return selectedWorkType != nil
@@ -124,8 +128,11 @@ struct ProcessAddView: View {
                 Spacer()
                 
                 // ── 하단 버튼(이전/다음) ───────────────────────────────
+                
                 NextButton(
-                    buttonType: step == .addTask ? .start : .next,  // 마지막 단계면 "Start"로
+                    buttonType: step == .workProgress && !(taskId?.isEmpty ?? true) ? .save : (step == .addTask ? .start : .next),
+                    //삼항 연산자
+                    // 프로그레스 스탭에서 기존 아이디가 있으면 저장하기(수정버튼)
                     buttonStyle: canNext ? .enabled : .disabled
                 ) {
                     withAnimation { goNext() }
@@ -133,7 +140,10 @@ struct ProcessAddView: View {
                 .safeAreaPadding(.horizontal, 16)
             }
         }
-
+        .onAppear {
+            guard let idString = taskId, let id = UUID(uuidString: idString) else { return }
+            task = container.taskRepository.fetchTask(by: id)
+        }
 
         .safeAreaPadding(.top, step == .workType ? 84 : 0)
         .safeAreaPadding(.bottom, 12)
@@ -141,6 +151,26 @@ struct ProcessAddView: View {
     
     // 네비게이션
     private func goNext() {
+        if step == .workProgress, let id = taskId, !id.isEmpty {
+            guard
+                let large = selectedLargeType,
+                let medium = selectedWorkType,
+                let process = selectedProcess
+            else { return }
+            
+            if let task = task {
+                container.taskRepository.updateTask(
+                    task,
+                    category: large.largeWork,
+                    subcategory: medium,
+                    process: process.title,
+                    progressRate: progress
+                )
+                dismiss()
+            }
+        }
+        
+        
         // ✅ startTime 단계에서 저장 후 다음 단계로 이동
         if step == .startTime {
             saveCurrentEntry()
@@ -193,5 +223,5 @@ struct ProcessAddView: View {
 }
 
 #Preview {
-    ProcessAddView()
+    ProcessAddView(taskId: "")
 }

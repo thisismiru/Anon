@@ -47,7 +47,7 @@ struct AddTaskView: View {
                 Button {
                     // TODO: 새 작업 추가 흐름으로 이동
                     container.navigationRouter.popToRooteView()
-                    container.navigationRouter.push(to: .processAddView)
+                    container.navigationRouter.push(to: .processAddView(taskId: ""))
                 } label: {
                     ZStack {
                         Circle()

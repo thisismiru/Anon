@@ -84,8 +84,24 @@ final class ConstructionTaskRepository {
     ///   - progressRate: 변경할 공정 진행률 (옵셔널, 지정하지 않으면 변경 없음)
     ///   - riskScore: 변경할 위험 점수 (옵셔널, 지정하지 않으면 변경 없음)
     func updateTask(_ task: ConstructionTask,
+                    category: String? = nil,
+                    subcategory: String? = nil,
+                    process: String? = nil,
+                    workers: Int? = nil,
                     progressRate: Int? = nil,
                     riskScore: Int? = nil) {
+        if let category = category {
+            task.category = category
+        }
+        if let subcategory = subcategory {
+            task.subcategory = subcategory
+        }
+        if let process = process {
+            task.process = process
+        }
+        if let workers = workers {
+            task.workers = workers
+        }
         if let progressRate = progressRate {
             task.progressRate = progressRate
         }
@@ -93,6 +109,7 @@ final class ConstructionTaskRepository {
             task.riskScore = riskScore
         }
         try? context.save()
+        print("✅ Task updated: id=\(task.id), category=\(task.category), subcategory=\(task.subcategory), process=\(task.process), workers=\(task.workers), progressRate=\(task.progressRate), riskScore=\(task.riskScore)")
     }
     
     /// 특정 작업(Task)을 삭제합니다.

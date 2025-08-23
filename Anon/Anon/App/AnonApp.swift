@@ -29,7 +29,7 @@ struct AnonApp: App {
                 SplashView()
                     .environmentObject(appFlowViewModel)
             case .addTask:
-                ProcessAddView()
+                ProcessAddView(taskId: "")
                     .environmentObject(di)
                     .environmentObject(appFlowViewModel)
             case .main:

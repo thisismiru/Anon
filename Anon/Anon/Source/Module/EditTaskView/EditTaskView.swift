@@ -56,12 +56,12 @@ struct EditTaskView: View {
                         .scaleEffect(1.5)
                 }
             }
-            .onAppear {
+            .task {
                 guard let idString = taskId, let id = UUID(uuidString: idString) else { return }
                 task = container.taskRepository.fetchTask(by: id)
             }
             .sheet(isPresented: $showEditSheet) {
-                ProcessAddView()
+                ProcessAddView(taskId: self.taskId)
                     .environmentObject(container)
             }
             .navigationTitle("Edit")

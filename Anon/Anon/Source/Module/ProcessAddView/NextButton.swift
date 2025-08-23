@@ -11,11 +11,13 @@ import SwiftUI
 enum NextButtonType {
     case next      // 기본 "Next"
     case start     // "Start Your Day Safely"
+    case save      // 정보 수정 후는 save
     
     var title: String {
         switch self {
         case .next:  return "Next"
         case .start: return "Start Your Day Safely"
+        case .save:  return "Save"
         }
     }
 }
