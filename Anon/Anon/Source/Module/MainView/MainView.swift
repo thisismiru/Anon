@@ -4,6 +4,7 @@ import SwiftData
 struct MainView: View {
     @EnvironmentObject var container: DIContainer
     @EnvironmentObject var appFlowViewModel: AppFlowViewModel
+    @Environment(\.modelContext) private var modelContext
     
     // 오늘 범위
     private let startOfToday: Date
@@ -266,6 +267,7 @@ private struct TaskRowCard: View {
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
+
         .background(
             RoundedRectangle(cornerRadius: 12).fill(Color.neutral10)
         )
