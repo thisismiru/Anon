@@ -33,9 +33,11 @@ struct NextButton: View {
             Text("다음")
                 .foregroundStyle(.neutral0)
                 .font(.h5)
+                .frame(width: .infinity)
+                .frame(height: 56)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
-                        .foregroundStyle(buttonStyle.color)
+                        .fill(buttonStyle.color)
                 )
         }
 
