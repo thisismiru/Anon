@@ -1,11 +1,12 @@
 //
-//  SwiftUIView.swift
+//  PredictViewModel.swift
 //  Anon
 //
 //  Created by 김재윤 on 8/24/25.
 //
 
 import SwiftUI
+import CoreML
 
 // MARK: - ViewModel
 class PredictViewModel: ObservableObject {
@@ -67,7 +68,38 @@ class PredictViewModel: ObservableObject {
                 )
                 
                 DispatchQueue.main.async {
-                    self.prediction = output.risk_index
+                    // 모델 출력의 모든 피처를 확인
+                    print("🔍 모델 출력 피처들:")
+                    for featureName in output.featureNames {
+                        if let featureValue = output.featureValue(for: featureName) {
+                            print("  - \(featureName): \(featureValue)")
+                        }
+                    }
+                    
+                    // risk_index 피처 찾기
+                    if let riskValue = output.featureValue(for: "risk_index")?.doubleValue {
+                        self.prediction = riskValue
+                        print("✅ 예측 성공: risk_index = \(riskValue)")
+                    } else {
+                        // 다른 가능한 피처 이름들 시도
+                        let possibleNames = ["risk_index", "risk", "prediction", "output", "result"]
+                        var foundValue: Double?
+                        
+                        for name in possibleNames {
+                            if let value = output.featureValue(for: name)?.doubleValue {
+                                foundValue = value
+                                print("✅ 다른 이름으로 찾음: \(name) = \(value)")
+                                break
+                            }
+                        }
+                        
+                        if let finalValue = foundValue {
+                            self.prediction = finalValue
+                        } else {
+                            self.errorMessage = "risk_index 피처를 찾을 수 없습니다. 출력된 피처: \(Array(output.featureNames))"
+                            print("❌ 예측 실패: 사용 가능한 피처 = \(Array(output.featureNames))")
+                        }
+                    }
                     self.isLoading = false
                 }
             } catch {
