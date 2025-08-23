@@ -133,39 +133,29 @@ struct ProcessAddView: View {
                     
                     Spacer()
                     
+                    // ── 하단 버튼(이전/다음) ───────────────────────────────
+                    
                     NextButton(
-                        buttonType: step == .addTask ? .start : .next,  // 마지막 단계면 "Start"로
+                        buttonType: step == .workProgress && !(taskId?.isEmpty ?? true) ? .save : (step == .addTask ? .start : .next),
+                        //삼항 연산자
+                        // 프로그레스 스탭에서 기존 아이디가 있으면 저장하기(수정버튼)
                         buttonStyle: canNext ? .enabled : .disabled
                     ) {
                         withAnimation { goNext() }
                     }
                     .safeAreaPadding(.horizontal, 16)
                 }
-                
-                Spacer()
-                
-                // ── 하단 버튼(이전/다음) ───────────────────────────────
-                
-                NextButton(
-                    buttonType: step == .workProgress && !(taskId?.isEmpty ?? true) ? .save : (step == .addTask ? .start : .next),
-                    //삼항 연산자
-                    // 프로그레스 스탭에서 기존 아이디가 있으면 저장하기(수정버튼)
-                    buttonStyle: canNext ? .enabled : .disabled
-                ) {
-                    withAnimation { goNext() }
-                }
-                .safeAreaPadding(.horizontal, 16)
+                .safeAreaPadding(.top, step == .workType ? 84 : 0)
+                .safeAreaPadding(.bottom, 12)
             }
+            .onAppear {
+                guard let idString = taskId, let id = UUID(uuidString: idString) else { return }
+                task = container.taskRepository.fetchTask(by: id)
+            }
+            
             .safeAreaPadding(.top, step == .workType ? 84 : 0)
             .safeAreaPadding(.bottom, 12)
         }
-        .onAppear {
-            guard let idString = taskId, let id = UUID(uuidString: idString) else { return }
-            task = container.taskRepository.fetchTask(by: id)
-        }
-
-        .safeAreaPadding(.top, step == .workType ? 84 : 0)
-        .safeAreaPadding(.bottom, 12)
     }
     
     // MARK: - Navigation

@@ -44,7 +44,7 @@ struct SplashView: View {
         .background(.blue50)
         .task {
             try? await Task.sleep(for: .seconds(2.5))
-            appFlowViewModel.appState = .main
+            appFlowViewModel.checkInitialState()
         }
     }
 }
