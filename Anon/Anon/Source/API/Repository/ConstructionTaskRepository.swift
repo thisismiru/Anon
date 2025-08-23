@@ -55,6 +55,29 @@ final class ConstructionTaskRepository {
         return try? context.fetch(descriptor).first
     }
     
+    /// Read (전체 조회)
+    /// Read (전체 조회)
+    func fetchAllTasks(sortedBy option: TaskSortOption = .startTime) -> [ConstructionTask] {
+        let descriptor: FetchDescriptor<ConstructionTask>
+        
+        switch option {
+        case .startTime:
+            descriptor = FetchDescriptor(
+                sortBy: [SortDescriptor(\.startTime)]
+            )
+        case .riskHighToLow:
+            descriptor = FetchDescriptor(
+                sortBy: [SortDescriptor(\.riskScore, order: .reverse)]
+            )
+        case .riskLowToHigh:
+            descriptor = FetchDescriptor(
+                sortBy: [SortDescriptor(\.riskScore, order: .forward)]
+            )
+        }
+        
+        return (try? context.fetch(descriptor)) ?? []
+    }
+    
     /// 기존 작업(Task)의 속성을 업데이트합니다.
     /// - Parameters:
     ///   - task: 수정할 `ConstructionTask`

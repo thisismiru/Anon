@@ -9,53 +9,60 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @EnvironmentObject var container: DIContainer
+    @State private var tasks: [ConstructionTask] = []
 
     var body: some View {
         NavigationSplitView {
             List {
-                ForEach(items) { item in
+                ForEach(tasks) { task in
                     NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("🕒 \(task.startTime.formatted(date: .numeric, time: .shortened))")
+                            Text("공정: \(task.process)")
+                            Text("진행률: \(task.progressRate)%")
+                            Text("투입 인원: \(task.workers)명")
+                            Text("위험 점수: \(task.riskScore)")
+                        }
+                        .padding()
                     } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+                        HStack {
+                            Text(task.process)
+                            Spacer()
+                            Text("\(task.riskScore)점")
+                                .foregroundColor(.red)
+                        }
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .onDelete { offsets in
+                    offsets.map { tasks[$0] }.forEach { container.taskRepository.deleteTask($0) }
+                    tasks = container.taskRepository.fetchAllTasks()
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
                 }
                 ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                    Button("Add Dummy Task") {
+                        container.taskRepository.addTask(
+                            category: "건축",
+                            subcategory: "골조공사",
+                            process: "철근 배근",
+                            progressRate: 30,
+                            workers: 5,
+                            startTime: Date(),
+                            riskScore: 65
+                        )
+                        tasks = container.taskRepository.fetchAllTasks()
                     }
                 }
             }
         } detail: {
-            Text("Select an item")
+            Text("작업을 선택하세요")
+        }
+        .onAppear {
+            tasks = container.taskRepository.fetchAllTasks()
         }
     }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
-        }
-    }
-}
-
-#Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }

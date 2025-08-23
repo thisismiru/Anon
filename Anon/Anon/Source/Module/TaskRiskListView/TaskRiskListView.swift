@@ -9,26 +9,25 @@ import SwiftUI
 import SwiftData
 
 struct TaskRiskListView: View {
-    @Query private var tasks: [ConstructionTask]
-    @Environment(\.modelContext) private var context
-    
+    @EnvironmentObject var container: DIContainer
+    @State private var tasks: [ConstructionTask] = []
+
     var body: some View {
         NavigationView {
             ScrollView {
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())],
-                          spacing: 16) {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                     ForEach(tasks) { task in
                         VStack(alignment: .leading, spacing: 8) {
                             Text(task.startTime.toHourMinute())
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
-                            
+
                             Text(task.process)
                                 .font(.headline)
                                 .lineLimit(1)
-                            
+
                             Spacer()
-                            
+
                             HStack {
                                 Text("\(task.riskScore)")
                                     .font(.system(size: 28, weight: .bold))
@@ -40,9 +39,16 @@ struct TaskRiskListView: View {
                         .frame(height: 120)
                         .background(Color.gray.opacity(0.3))
                         .cornerRadius(8)
+                        .onTapGesture {
+                            container.navigationRouter.push(to: .taskRiskDetailView(taskId: "1"))
+                        }
                     }
                 }
                 .padding()
+            }
+            .navigationTitle("작업 위험도")
+            .onAppear {
+                tasks = container.taskRepository.fetchAllTasks(sortedBy: .riskHighToLow)
             }
         }
     }
