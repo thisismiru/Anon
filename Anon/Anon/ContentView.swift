@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
     @EnvironmentObject var container: DIContainer
@@ -65,4 +64,8 @@ struct ContentView: View {
             tasks = container.taskRepository.fetchAllTasks()
         }
     }
+}
+
+#Preview {
+    ContentView()
 }

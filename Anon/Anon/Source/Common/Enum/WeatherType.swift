@@ -5,7 +5,7 @@
 //  Created by jeongminji on 8/23/25.
 //
 
-enum WeatherType: String {
+enum WeatherType: String, CaseIterable {
     case blizzard = "Blizzard"
     case downpour = "Downpour"
     case clear = "Clear"
@@ -27,6 +27,24 @@ enum WeatherType: String {
             return "안개"
         case .cloud:
             return "흐림"
+        }
+    }
+    
+    // ANON 모델용 변환
+    func toModelValue() -> String {
+        switch self {
+        case .blizzard:
+            return "snowy"
+        case .downpour:
+            return "rainy"
+        case .clear:
+            return "sunny"
+        case .wind:
+            return "windy"
+        case .fog:
+            return "foggy"
+        case .cloud:
+            return "cloudy"
         }
     }
 }
