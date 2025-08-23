@@ -221,6 +221,22 @@ struct MainView: View {
                 .environmentObject(container)
                 .environmentObject(appFlowViewModel)
         }
+        .overlay(
+            // 플러스 버튼을 우측 하단에 배치
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    PlusButton(action: {
+                        // 플러스 버튼을 누르면 테스크 추가 화면으로 이동
+                        appFlowViewModel.appState = .addTask
+                    })
+                    .frame(width: 48, height: 48)
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 20)
+                }
+            }
+        )
     }
     
     // MARK: - SwiftData 초기화
