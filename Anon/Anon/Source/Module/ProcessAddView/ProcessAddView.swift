@@ -49,10 +49,11 @@ enum OnboardingStep: Int, CaseIterable {
 // 2) 컨테이너
 struct ProcessAddView: View {
     @EnvironmentObject var container: DIContainer
+    @EnvironmentObject var appFlowViewModel: AppFlowViewModel
     @State private var step: OnboardingStep = .workType
     
     // ✅ SwiftData 컨텍스트
-        @Environment(\.modelContext) private var modelContext
+    @Environment(\.modelContext) private var modelContext
     
     // 수집 데이터 (필요한 것만 추가/수정)
     @State private var selectedLargeType: WorkType? = nil   // ⬅️ 대분류
@@ -74,6 +75,7 @@ struct ProcessAddView: View {
     }
     
     var body: some View {
+        
         VStack(alignment: .leading, spacing: 36) {
             
             if step != .workType {
@@ -112,27 +114,32 @@ struct ProcessAddView: View {
                             // WorkStartTimeInputView …
                             StartTimeView(startTime: $startTime)
                         case .addTask:
-                            // WorkAddTaskView …
-                            AddTaskView()
+                            AddTaskView(onTapAdd: {        // ⬅️ 콜백 연결
+                                withAnimation {
+                                    restart()
+                                }
+                            })
                         }
+                        
                     }
                     
+                    Spacer()
+                    
+                    NextButton(
+                        buttonType: step == .addTask ? .start : .next,  // 마지막 단계면 "Start"로
+                        buttonStyle: canNext ? .enabled : .disabled
+                    ) {
+                        withAnimation { goNext() }
+                    }
+                    .safeAreaPadding(.horizontal, 16)
                 }
-                
-                Spacer()
-                
-                // ── 하단 버튼(이전/다음) ───────────────────────────────
-                NextButton(
-                    buttonType: step == .addTask ? .start : .next,  // 마지막 단계면 "Start"로
-                    buttonStyle: canNext ? .enabled : .disabled
-                ) {
-                    withAnimation { goNext() }
-                }
-                .safeAreaPadding(.horizontal, 16)
             }
+            .safeAreaPadding(.top, step == .workType ? 84 : 0)
+            .safeAreaPadding(.bottom, 12)
         }
-        .safeAreaPadding(.top, step == .workType ? 84 : 0)
-        .safeAreaPadding(.bottom, 12)
+        
+        
+        
     }
     
     // 네비게이션
@@ -143,8 +150,7 @@ struct ProcessAddView: View {
         }
         
         if step == .addTask {
-            container.navigationRouter.popToRooteView()
-            container.navigationRouter.push(to: .mainView)
+            appFlowViewModel.checkInitialState()
         }
         
         guard let i = OnboardingStep.allCases.firstIndex(of: step),
@@ -164,7 +170,7 @@ struct ProcessAddView: View {
             let process = selectedProcess,         // WorkProcess
             let workers = headcount                // Int
         else { return }
-
+        
         let task = ConstructionTask(
             category: large.largeWork,            // 대분류 이름 (String)
             subcategory: medium,                  // 소분류 (String)
@@ -174,17 +180,29 @@ struct ProcessAddView: View {
             startTime: startTime,                 // Date
             riskScore: 88                         // 고정값
         )
-
+        
         modelContext.insert(task)
-
-//         필요하다면 즉시 저장 (기본적으로 자동저장됨)
-         do {
-             try modelContext.save()
-             print("성공했습니다.")
-             print(startTime)
-         } catch {
-             print("Save error: \(error)")
-         }
+        
+        //         필요하다면 즉시 저장 (기본적으로 자동저장됨)
+        do {
+            try modelContext.save()
+            print("성공했습니다.")
+            print(startTime)
+        } catch {
+            print("Save error: \(error)")
+        }
+    }
+    
+    private func restart() {
+        // 필요한 수집값 초기화
+        selectedLargeType = nil
+        selectedWorkType  = nil
+        selectedProcess   = nil
+        progress          = 0
+        headcount         = nil
+        startTime         = .now
+        
+        step = .workType                 // ⬅️ 여기서 단계 리셋
     }
 }
 
