@@ -52,6 +52,7 @@ struct ProcessAddView: View {
     @EnvironmentObject var appFlowViewModel: AppFlowViewModel
     @State private var step: OnboardingStep = .workType
     
+    
     // ✅ SwiftData 컨텍스트
     @Environment(\.modelContext) private var modelContext
     
@@ -73,6 +74,7 @@ struct ProcessAddView: View {
         case .addTask:     return true
         }
     }
+
     
     var body: some View {
         
@@ -136,9 +138,10 @@ struct ProcessAddView: View {
             .safeAreaPadding(.top, step == .workType ? 84 : 0)
             .safeAreaPadding(.bottom, 12)
         }
-        
-        
-        
+
+        .safeAreaPadding(.top, step == .workType ? 84 : 0)
+        .safeAreaPadding(.bottom, 12)
+
     }
     
     // 네비게이션

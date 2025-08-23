@@ -42,9 +42,7 @@ struct TaskRiskListView: View {
                         .padding(.horizontal, 16)
                     }
                     
-                    PlusButton(action:{
-                        container.navigationRouter.push(to: .taskRiskDetailView(taskId: "z")
-                        )}
+                    PlusButton(action:{container.navigationRouter.push(to: .processAddView)}
                     )
                     .frame(width: 56, height: 56)
                     .padding(.trailing, 16)
