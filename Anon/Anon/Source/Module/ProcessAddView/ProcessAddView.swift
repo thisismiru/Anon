@@ -52,8 +52,6 @@ struct ProcessAddView: View {
     @EnvironmentObject var appFlowViewModel: AppFlowViewModel
     @State private var step: OnboardingStep = .workType
     
-    private var taskId: String
-    @State private var task: ConstructionTask?
     
     // ✅ SwiftData 컨텍스트
     @Environment(\.modelContext) private var modelContext
@@ -79,10 +77,7 @@ struct ProcessAddView: View {
         case .addTask:     return true
         }
     }
-    
-    init(taskId: String? = nil) {
-        self.taskId = taskId ?? ""
-    }
+
     
     var body: some View {
         
