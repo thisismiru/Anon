@@ -44,9 +44,9 @@ struct MainView: View {
         )
     }
 
-    // ✅ topTwo: 오늘 작업을 riskScore 순으로 2개
-    private var topTwo: [ConstructionTask] {
-        Array(rankedToday.prefix(2))
+    // ✅ topThree: 오늘 작업을 riskScore 순으로 3개
+    private var topThree: [ConstructionTask] {
+        Array(rankedToday.prefix(3))
     }
 
     // ✅ averageRisk: 오늘 작업들의 riskScore 평균
@@ -92,14 +92,22 @@ struct MainView: View {
                                         .foregroundStyle(.neutral70)
                                     
                                     VStack(spacing: 4) {
+                                        // 1등: 가장 위험한 작업
                                         (
                                             Text("1. ").font(.b1).foregroundStyle(.neutral100) +
-                                            Text(topTwo.first?.process ?? "—")
+                                            Text(topThree.first?.process ?? "—")
                                                 .font(.b1).foregroundStyle(.neutral100)
                                         )
+                                        // 2등: 두 번째로 위험한 작업
                                         (
                                             Text("2. ").font(.b1).foregroundStyle(.neutral100) +
-                                            Text(topTwo.dropFirst().first?.process ?? "—")
+                                            Text(topThree.dropFirst().first?.process ?? "—")
+                                                .font(.b1).foregroundStyle(.neutral100)
+                                        )
+                                        // 3등: 세 번째로 위험한 작업
+                                        (
+                                            Text("3. ").font(.b1).foregroundStyle(.neutral100) +
+                                            Text(topThree.dropFirst(2).first?.process ?? "—")
                                                 .font(.b1).foregroundStyle(.neutral100)
                                         )
                                     }
@@ -128,6 +136,9 @@ struct MainView: View {
                                 }
                                 .padding(.vertical, 24)
                                 .padding(.trailing, 24)
+                            }
+                            .onTapGesture {
+                                container.navigationRouter.push(to: .taskRiskListView)
                             }
                             
                             
