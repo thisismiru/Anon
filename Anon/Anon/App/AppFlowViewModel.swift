@@ -37,7 +37,7 @@ class AppFlowViewModel: ObservableObject {
         }
     }
     
-    private func checkInitialState() {
+    func checkInitialState() {
         var descriptor = FetchDescriptor<ConstructionTask>()
         descriptor.fetchLimit = 1
         let tasks = try? context.fetch(descriptor)

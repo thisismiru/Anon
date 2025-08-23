@@ -36,8 +36,8 @@ struct WorkProcessView: View {
                 .foregroundStyle(isSelected ? Color.blue : Color.primary.opacity(0.75))
                 .frame(maxWidth: .infinity, minHeight: 60)
                 .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(isSelected ? Color.blue.opacity(0.12) : Color.gray.opacity(0.12))
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(isSelected ? .blue10 : .neutral20)
                 )
         }
         .buttonStyle(.plain)
