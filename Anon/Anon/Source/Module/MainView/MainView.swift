@@ -19,8 +19,8 @@ struct MainView: View {
     var body: some View {
         NavigationStack(path: $container.navigationRouter.destination) {
             VStack(spacing: 16) {
-                Text("오늘의 위험도 70%")
-                    .background(.yellow)
+                // 오늘의 진행도 카드
+                TodayProgressCard(tasks: tasks)
                     .onTapGesture {
                         container.navigationRouter.push(to: .taskRiskListView)
                     }
