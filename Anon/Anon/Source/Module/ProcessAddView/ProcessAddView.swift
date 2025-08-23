@@ -52,6 +52,9 @@ struct ProcessAddView: View {
     @EnvironmentObject var appFlowViewModel: AppFlowViewModel
     @State private var step: OnboardingStep = .workType
     
+    private var taskId: String
+    @State private var task: ConstructionTask?
+    
     // ✅ SwiftData 컨텍스트
     @Environment(\.modelContext) private var modelContext
     
@@ -75,6 +78,10 @@ struct ProcessAddView: View {
         case .startTime:   return true
         case .addTask:     return true
         }
+    }
+    
+    init(taskId: String? = nil) {
+        self.taskId = taskId ?? ""
     }
     
     var body: some View {
@@ -140,9 +147,6 @@ struct ProcessAddView: View {
             .safeAreaPadding(.top, step == .workType ? 84 : 0)
             .safeAreaPadding(.bottom, 12)
         }
-        
-        
-        
     }
     
     // 네비게이션
