@@ -9,52 +9,68 @@ import SwiftUI
 import SwiftData
 
 struct TaskRiskListView: View {
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var container: DIContainer
     @State private var tasks: [ConstructionTask] = []
-
+    
     var body: some View {
         NavigationView {
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                    ForEach(tasks) { task in
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(task.startTime.toHourMinute())
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-
-                            Text(task.process)
-                                .font(.headline)
-                                .lineLimit(1)
-
-                            Spacer()
-
-                            HStack {
-                                Text("\(task.riskScore)")
-                                    .font(.system(size: 28, weight: .bold))
-                                Text("점")
-                                    .font(.subheadline)
+            VStack {
+                ZStack {
+                    NavigationBar(style: .simpleBack, onBack: { dismiss() })
+                    Text("Today’s Works")
+                        .font(.h5)
+                        .foregroundStyle(.neutral100)
+                }
+                
+                ZStack(alignment: .bottomTrailing) {
+                    ScrollView {
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 9) {
+                            ForEach(tasks) { task in
+                                Button {
+                                    container.navigationRouter.push(to: .taskRiskDetailView(taskId: task.id.uuidString))
+                                } label: {
+                                    TaskRiskCard(
+                                        time: task.startTime.toHourMinuteAmPm(),
+                                        process: task.process,
+                                        riskScore: task.riskScore
+                                    )
+                                }
+                                .buttonStyle(.plain)
                             }
                         }
-                        .padding()
-                        .frame(height: 120)
-                        .background(Color.gray.opacity(0.3))
-                        .cornerRadius(8)
-                        .onTapGesture {
-                            container.navigationRouter.push(to: .taskRiskDetailView(taskId: "1"))
-                        }
+                        .padding(.horizontal, 16)
                     }
+                    
+                    PlusButton(action:{
+                        container.navigationRouter.push(to: .taskRiskDetailView(taskId: "z")
+                        )}
+                    )
+                    .frame(width: 56, height: 56)
+                    .padding(.trailing, 16)
+                    .safeAreaPadding(.bottom, 34)
                 }
-                .padding()
             }
-            .navigationTitle("작업 위험도")
-            .onAppear {
+            .padding(.top, 50)
+            .ViewBG()
+            .task {
                 tasks = container.taskRepository.fetchAllTasks(sortedBy: .riskHighToLow)
             }
         }
+        .navigationBarHidden(true)
     }
 }
 
 #Preview {
+    let previewContainer = try! ModelContainer(
+        for: ConstructionTask.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
+    
     TaskRiskListView()
-        .modelContainer(for: ConstructionTask.self, inMemory: true)
+        .environmentObject(DIContainer(
+            navigationRouter: NavigationRouter(),
+            modelContainer: previewContainer,
+            modelContext: previewContainer.mainContext
+        ))
 }
