@@ -2,7 +2,7 @@ import SwiftUI
 
 /// 0–90%, 10% 단위 스냅 슬라이더 (눈금 10개, 9등분)
 struct WorkProgressView: View {
-    @Binding var progress: Double   // 항상 0,10,20,…,90
+    @Binding var progress: Int   // 항상 0,10,20,…,90
     
     // 스타일
     private let trackHeight: CGFloat = 4
@@ -78,7 +78,7 @@ struct WorkProgressView: View {
     }
     
     // 현재 단계(0~9)
-    private var currentStep: Int { Int(round(progress / 10.0)) }
+    private var currentStep: Int { Int(round(Double(progress) / 10.0)) }
     
     // 주어진 width에서 현재 X (0~width)
     private func currentX(width: CGFloat) -> CGFloat {
@@ -91,7 +91,7 @@ struct WorkProgressView: View {
         let clampedX = max(0, min(width, x))
         let ratio = clampedX / width
         let snappedStep = Int((ratio * CGFloat(maxStep)).rounded()) // 0..9
-        let snappedProgress = Double(snappedStep * 10)              // 0,10,…,90
+        let snappedProgress = Int(snappedStep * 10)              // 0,10,…,90
         
         if Int(progress / 10) != snappedStep {
             UISelectionFeedbackGenerator().selectionChanged()
