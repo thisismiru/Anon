@@ -18,6 +18,9 @@ struct MainView: View {
 
     // ✅ 탭해서 펼친 카드 추적
     @State private var expandedTaskID: UUID? = nil
+    
+    // ✅ SwiftData 초기화 관련
+    @State private var showingResetAlert: Bool = false
 
     init() {
         let cal = Calendar.current
@@ -155,6 +158,38 @@ struct MainView: View {
                             }
                             .padding(.horizontal, 16)
                             .padding(.bottom, 24)
+                            
+                            // SwiftData 초기화 버튼
+                            VStack(spacing: 16) {
+                                Button(action: {
+                                    showingResetAlert = true
+                                }) {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "trash.circle.fill")
+                                            .foregroundColor(.red)
+                                            .font(.title2)
+                                        
+                                        Text("SwiftData 초기화")
+                                            .foregroundColor(.red)
+                                            .fontWeight(.semibold)
+                                    }
+                                    .padding(.vertical, 12)
+                                    .padding(.horizontal, 20)
+                                    .background(Color.red.opacity(0.1))
+                                    .cornerRadius(10)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(Color.red.opacity(0.3), lineWidth: 1)
+                                    )
+                                }
+                                
+                                Text("모든 저장된 작업 데이터가 삭제됩니다")
+                                    .font(.caption)
+                                    .foregroundColor(.neutral60)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.bottom, 32)
                         }
                     }
                     
@@ -162,10 +197,33 @@ struct MainView: View {
                 
             }
         }
+        .alert("SwiftData 초기화", isPresented: $showingResetAlert) {
+            Button("취소", role: .cancel) { }
+            Button("초기화", role: .destructive) {
+                resetSwiftData()
+            }
+        } message: {
+            Text("모든 저장된 작업 데이터가 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.")
+        }
         .navigationDestination(for: NavigationDestination.self) { destination in
             NavigationRoutingView(destination: destination)
                 .environmentObject(container)
                 .environmentObject(appFlowViewModel)
+        }
+    }
+    
+    // MARK: - SwiftData 초기화
+    private func resetSwiftData() {
+        do {
+            // 모든 ConstructionTask 삭제
+            try modelContext.delete(model: ConstructionTask.self)
+            
+            // 변경사항 저장
+            try modelContext.save()
+            
+            print("✅ SwiftData 초기화 완료")
+        } catch {
+            print("❌ SwiftData 초기화 실패: \(error)")
         }
     }
 }

@@ -137,21 +137,13 @@ struct ProcessAddView: View {
                     }
                     .safeAreaPadding(.horizontal, 16)
                 }
-                Spacer()
-                NextButton(
-                    buttonType: step == .addTask ? .start : .next,  // 마지막 단계면 "Start"로
-                    buttonStyle: canNext ? .enabled : .disabled
-                ) {
-                    withAnimation { goNext() }
-                }
-                .safeAreaPadding(.horizontal, 16)
             }
             .safeAreaPadding(.top, step == .workType ? 84 : 0)
             .safeAreaPadding(.bottom, 12)
         }
     }
     
-    // 네비게이션
+    // MARK: - Navigation
     private func goNext() {
         // ✅ startTime 단계에서 저장 후 다음 단계로 이동
         if step == .startTime {
@@ -166,12 +158,13 @@ struct ProcessAddView: View {
               i < OnboardingStep.allCases.count - 1 else { return }
         step = OnboardingStep.allCases[i + 1]
     }
+    
     private func goBack() {
         guard let i = OnboardingStep.allCases.firstIndex(of: step), i > 0 else { return }
         step = OnboardingStep.allCases[i - 1]
     }
     
-    // SwiftData 저장
+    // MARK: - SwiftData 저장
     private func saveCurrentEntry() {
         guard
             let large = selectedLargeType,         // WorkType
@@ -249,7 +242,6 @@ struct ProcessAddView: View {
     ) {
         let predictedRiskScore = Int(predictViewModel.prediction)
         
-
         let task = ConstructionTask(
             category: large.largeWork,            // 대분류 이름 (String)
             subcategory: medium,                  // 소분류 (String)
@@ -288,16 +280,10 @@ struct ProcessAddView: View {
         case .concrete: return .concrete
         case .demolition: return .demolition
         case .others: return .other
-        //         필요하다면 즉시 저장 (기본적으로 자동저장됨)
-        do {
-            try modelContext.save()
-            print("성공했습니다.")
-            print(startTime)
-        } catch {
-            print("Save error: \(error)")
         }
     }
     
+    // MARK: - Helper Methods
     private func restart() {
         // 필요한 수집값 초기화
         selectedLargeType = nil
