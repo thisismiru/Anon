@@ -393,9 +393,9 @@ struct PreditcView: View {
     }
     
     private func riskColor(for value: Double) -> Color {
-        if value < 0.3 {
+        if value < 10.0 {
             return .green
-        } else if value < 0.7 {
+        } else if value < 20.0 {
             return .orange
         } else {
             return .red
