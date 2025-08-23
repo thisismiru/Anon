@@ -9,6 +9,11 @@ import Foundation
 import SwiftUI
 
 extension Font {
+    /// ArialBlack font factory
+    static func arialBlack(size: CGFloat) -> Font {
+        .custom("Arial-Black", size: size)
+    }
+        
     enum Pretendard {
         case semiBold
         case medium

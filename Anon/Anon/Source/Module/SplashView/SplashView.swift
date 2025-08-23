@@ -6,16 +6,42 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct SplashView: View {
     @EnvironmentObject var appFlowViewModel: AppFlowViewModel
     
     var body: some View {
-        VStack {
-            Text("Splash")
+        ZStack {
+            VStack {
+                Text("당신의 안전한 오늘을 위해,")
+                    .font(.h5)
+                    .foregroundStyle(.neutral0)
+                
+                Spacer()
+                    .frame(height: 12)
+                
+                Text("안온")
+                    .font(.h2)
+                    .foregroundStyle(.neutral0)
+                
+                Spacer()
+                    .frame(height: 100)
+                
+                Image(.mainlogo)
+                
+                Spacer()
+                    .frame(height: 40)
+                
+                Text("ANON")
+                    .font(.arialBlack(size: 23))
+                    .foregroundStyle(.neutral0)
+            }
         }
+        .frame(maxWidth: .infinity)
+        .frame(maxHeight: .infinity)
         .ignoresSafeArea()
-        .background(.blue)
+        .background(.blue50)
         .task {
             try? await Task.sleep(nanoseconds: 1_500_000_000)
             appFlowViewModel.appState = .main
@@ -25,4 +51,12 @@ struct SplashView: View {
 
 #Preview {
     SplashView()
+}
+
+#Preview {
+    let container = try! ModelContainer(for: ConstructionTask.self)
+    let context = container.mainContext
+    
+    SplashView()
+        .environmentObject(AppFlowViewModel(context: context))
 }

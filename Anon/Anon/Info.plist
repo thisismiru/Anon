@@ -10,12 +10,18 @@
 		<dict>
 			<key>http://api.weatherapi.com/v1/forecast.json</key>
 			<dict>
-				<key>NSIncluedsSubdomains</key>
-				<string></string>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
+				<key>NSIncluedsSubdomains</key>
+				<string></string>
 			</dict>
 		</dict>
 	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>arial_black.ttf</string>
+		<string>PretendardVariable.ttf</string>
+		<string></string>
+	</array>
 </dict>
 </plist>
