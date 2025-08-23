@@ -123,16 +123,15 @@ struct ProcessAddView: View {
                         
                     }
                     
-                    Spacer()
-                    
-                    NextButton(
-                        buttonType: step == .addTask ? .start : .next,  // 마지막 단계면 "Start"로
-                        buttonStyle: canNext ? .enabled : .disabled
-                    ) {
-                        withAnimation { goNext() }
-                    }
-                    .safeAreaPadding(.horizontal, 16)
                 }
+                Spacer()
+                NextButton(
+                    buttonType: step == .addTask ? .start : .next,  // 마지막 단계면 "Start"로
+                    buttonStyle: canNext ? .enabled : .disabled
+                ) {
+                    withAnimation { goNext() }
+                }
+                .safeAreaPadding(.horizontal, 16)
             }
             .safeAreaPadding(.top, step == .workType ? 84 : 0)
             .safeAreaPadding(.bottom, 12)
