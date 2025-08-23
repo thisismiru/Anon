@@ -30,7 +30,7 @@ struct NextButton: View {
         Button {
             action()
         } label: {
-            Text("다음")
+            Text("Next")
                 .foregroundStyle(.neutral0)
                 .font(.h5)
                 .frame(width: .infinity)
