@@ -17,7 +17,7 @@ struct NavigationRoutingView: View {
         Group {
             switch destination {
             case .mainView:
-                MainView(container: _container)
+                MainView()
             case .processAddView:
                 ProcessAddView(container: _container)
             case .taskRiskListView:

@@ -54,8 +54,7 @@ struct ProcessAddView: View {
     
     
     // ✅ SwiftData 컨텍스트
-    @Environment(\.modelContext) private var modelContext
-    
+    @Environment(\.modelContext) private var modelContext    
     // ✅ PredictViewModel 추가
     @StateObject private var predictViewModel = PredictViewModel()
     
@@ -138,6 +137,14 @@ struct ProcessAddView: View {
                     }
                     .safeAreaPadding(.horizontal, 16)
                 }
+                Spacer()
+                NextButton(
+                    buttonType: step == .addTask ? .start : .next,  // 마지막 단계면 "Start"로
+                    buttonStyle: canNext ? .enabled : .disabled
+                ) {
+                    withAnimation { goNext() }
+                }
+                .safeAreaPadding(.horizontal, 16)
             }
             .safeAreaPadding(.top, step == .workType ? 84 : 0)
             .safeAreaPadding(.bottom, 12)
@@ -242,6 +249,7 @@ struct ProcessAddView: View {
     ) {
         let predictedRiskScore = Int(predictViewModel.prediction)
         
+
         let task = ConstructionTask(
             category: large.largeWork,            // 대분류 이름 (String)
             subcategory: medium,                  // 소분류 (String)
@@ -280,6 +288,13 @@ struct ProcessAddView: View {
         case .concrete: return .concrete
         case .demolition: return .demolition
         case .others: return .other
+        //         필요하다면 즉시 저장 (기본적으로 자동저장됨)
+        do {
+            try modelContext.save()
+            print("성공했습니다.")
+            print(startTime)
+        } catch {
+            print("Save error: \(error)")
         }
     }
     
