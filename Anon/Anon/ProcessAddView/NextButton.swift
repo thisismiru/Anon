@@ -8,6 +8,18 @@
 import Foundation
 import SwiftUI
 
+enum NextButtonType {
+    case next      // 기본 "Next"
+    case start     // "Start Your Day Safely"
+    
+    var title: String {
+        switch self {
+        case .next:  return "Next"
+        case .start: return "Start Your Day Safely"
+        }
+    }
+}
+
 enum NextButtonStyle {
     case enabled
     case disabled
@@ -22,24 +34,27 @@ enum NextButtonStyle {
     }
 }
 
+
 struct NextButton: View {
-    var action: () -> Void
+    var buttonType: NextButtonType = .next
     var buttonStyle: NextButtonStyle = .disabled
+    var action: () -> Void
     
     var body: some View {
         Button {
             action()
         } label: {
-            Text("Next")
+            Text(buttonType.title)
                 .foregroundStyle(.neutral0)
                 .font(.h5)
-                .frame(width: .infinity)
+                .frame(maxWidth: .infinity)
                 .frame(height: 56)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
                         .fill(buttonStyle.color)
                 )
         }
+        .disabled(buttonStyle == .disabled)
 
     }
 }

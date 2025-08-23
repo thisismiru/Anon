@@ -25,7 +25,6 @@ struct NavigationBar: View {
             // Left
             Button(action: onBack) {
                 Image(.navigationBarBack)
-                    .resizable()
                     .frame(width: 24, height: 24)
             }
 
@@ -40,12 +39,10 @@ struct NavigationBar: View {
                 HStack(spacing: 12) {
                     Button(action: onEdit) {
                         Image(.navigationBarEdit)
-                            .resizable()
                             .frame(width: 24, height: 24)
                     }
                     Button(action: onDelete) {
                         Image(.navigationBarTrash)
-                            .resizable()
                             .frame(width: 24, height: 24)
                     }
                 }
