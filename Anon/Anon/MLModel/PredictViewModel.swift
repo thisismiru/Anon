@@ -19,7 +19,7 @@ class PredictViewModel: ObservableObject {
     @Published var selectedMediumWork: String = "공동주택"
     @Published var selectedProcess: ProcessType = .foundation
     @Published var progressRate: Double = 30.0
-    @Published var selectedWorkerCount: WorkerCount = .five
+    @Published var selectedWorkerCount: WorkerCount = .underNineteen
     
     @Published var prediction: Double = 0.0
     @Published var isLoading = false
@@ -98,20 +98,20 @@ class PredictViewModel: ObservableObject {
     private func updateWorkerCountFromTask(_ task: ConstructionTask) {
         // workers 수를 기반으로 WorkerCount 찾기
         switch task.workers {
-        case 1...4:
-            selectedWorkerCount = .oneToFour
-        case 5...9:
-            selectedWorkerCount = .five
-        case 10...19:
-            selectedWorkerCount = .tenToNineteen
+        case 1...19:
+            selectedWorkerCount = .underNineteen
         case 20...49:
             selectedWorkerCount = .twentyToFortyNine
         case 50...99:
             selectedWorkerCount = .fiftyToNinetyNine
-        case 100...:
-            selectedWorkerCount = .hundredPlus
+        case 100...299:
+            selectedWorkerCount = .oneHundredToTwoHundredNinetyNine
+        case 300...499:
+            selectedWorkerCount = .threeHundredToFourHundredNinetyNine
+        case 500...:
+            selectedWorkerCount = .fiveHundredPlus
         default:
-            selectedWorkerCount = .five
+            selectedWorkerCount = .underNineteen
         }
     }
     
@@ -289,32 +289,32 @@ enum ProcessType: String, CaseIterable {
 }
 
 enum WorkerCount: String, CaseIterable {
-    case oneToFour = "1_4"
-    case five = "5_9"
-    case tenToNineteen = "10_19"
-    case twentyToFortyNine = "20_49"
-    case fiftyToNinetyNine = "50_99"
-    case hundredPlus = "100+"
+    case underNineteen = "19인 미만"
+    case twentyToFortyNine = "20~49인"
+    case fiftyToNinetyNine = "50~99인"
+    case oneHundredToTwoHundredNinetyNine = "100~299인"
+    case threeHundredToFourHundredNinetyNine = "300~499인"
+    case fiveHundredPlus = "500인 이상"
     
     var displayName: String {
         switch self {
-        case .oneToFour: return "1~4인"
-        case .five: return "5~9인"
-        case .tenToNineteen: return "10~19인"
+        case .underNineteen: return "19인 미만"
         case .twentyToFortyNine: return "20~49인"
         case .fiftyToNinetyNine: return "50~99인"
-        case .hundredPlus: return "100인 이상"
+        case .oneHundredToTwoHundredNinetyNine: return "100~299인"
+        case .threeHundredToFourHundredNinetyNine: return "300~499인"
+        case .fiveHundredPlus: return "500인 이상"
         }
     }
     
     func toWorkerCount() -> Int {
         switch self {
-        case .oneToFour: return 3
-        case .five: return 7
-        case .tenToNineteen: return 15
-        case .twentyToFortyNine: return 35
+        case .underNineteen: return 10  // 1~19인의 중간값
+        case .twentyToFortyNine: return 35  // 20~49인의 중간값
         case .fiftyToNinetyNine: return 75
-        case .hundredPlus: return 150
+        case .oneHundredToTwoHundredNinetyNine: return 200
+        case .threeHundredToFourHundredNinetyNine: return 400
+        case .fiveHundredPlus: return 500
         }
     }
 }

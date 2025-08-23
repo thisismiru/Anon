@@ -220,8 +220,7 @@ struct PreditcView: View {
                         viewModel.selectedMediumWork = "공동주택"
                         viewModel.selectedProcess = .cleanup
                         viewModel.progressRate = 30
-                        viewModel.selectedWorkerCount = .fiftyToNinetyNine
-                        
+                        viewModel.selectedWorkerCount = .underNineteen
                         print("🧪 === 테스트 값 설정 완료 ===")
                         Task {
                             await viewModel.predictRisk()
