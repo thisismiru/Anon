@@ -18,15 +18,8 @@ struct TaskRiskDetailView: View {
     @State private var selectedIndex: Int = 0
     @State private var showEditSheet = false
     
-    let sampleData = [
-        HourlyRiskModel(hour: 9, score: 45),
-        HourlyRiskModel(hour: 10, score: 60),
-        HourlyRiskModel(hour: 11, score: 30),
-        HourlyRiskModel(hour: 12, score: 75),
-        HourlyRiskModel(hour: 13, score: 50),
-        HourlyRiskModel(hour: 14, score: 20),
-        HourlyRiskModel(hour: 15, score: 40)
-    ]
+    @State private var hourlyRiskData: [HourlyRiskModel] = []
+    @State private var optimalWorkTime: (startTime: Int, endTime: Int, reason: String) = (8, 12, "")
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -55,10 +48,56 @@ struct TaskRiskDetailView: View {
                     Spacer()
                         .frame(height: 30)
                     
-                    RiskGraphView(data: sampleData, selectedHour: 12)
+                    RiskGraphView(data: hourlyRiskData, selectedHour: 12)
                     
                     Spacer()
                         .frame(height: 51)
+                    
+                    // 최적 작업 시간 추천
+                    VStack(spacing: 12) {
+                        Text("최적 작업 시간 추천")
+                            .font(.h4)
+                            .foregroundStyle(.neutral100)
+                        
+                        HStack(spacing: 16) {
+                            VStack(spacing: 4) {
+                                Text("\(optimalWorkTime.startTime):00")
+                                    .font(.title2)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.neutral100)
+                                Text("시작")
+                                    .font(.caption)
+                                    .foregroundStyle(.neutral60)
+                            }
+                            
+                            Text("-")
+                                .font(.title2)
+                                .foregroundStyle(.neutral60)
+                            
+                            VStack(spacing: 4) {
+                                Text("\(optimalWorkTime.endTime):00")
+                                    .font(.title2)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(.neutral100)
+                                Text("종료")
+                                    .font(.caption)
+                                    .foregroundStyle(.neutral60)
+                            }
+                        }
+                        
+                        Text(optimalWorkTime.reason)
+                            .font(.caption)
+                            .foregroundStyle(.neutral80)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 16)
+                    }
+                    .padding(.vertical, 16)
+                    .padding(.horizontal, 20)
+                    .background(Color.blue.opacity(0.1))
+                    .cornerRadius(12)
+                    
+                    Spacer()
+                        .frame(height: 30)
                     
                     HStack(spacing: 4) {
                         Text("\(task.progressRate)")
@@ -120,6 +159,25 @@ struct TaskRiskDetailView: View {
     private func loadTask() {
         guard let idString = taskId, let id = UUID(uuidString: idString) else { return }
         task = container.taskRepository.fetchTask(by: id)
+        
+        // 작업이 로드되면 시간대별 위험도와 최적 작업 시간 계산
+        if let loadedTask = task {
+            calculateHourlyRiskAndOptimalTime(for: loadedTask)
+        }
+    }
+    
+    private func calculateHourlyRiskAndOptimalTime(for task: ConstructionTask) {
+        // 시간대별 위험도 계산
+        hourlyRiskData = HourlyRiskCalculator.calculateHourlyRisk(
+            for: task,
+            baseRiskScore: task.riskScore
+        )
+        
+        // 최적 작업 시간 추천
+        optimalWorkTime = HourlyRiskCalculator.recommendOptimalWorkTime(
+            for: task,
+            baseRiskScore: task.riskScore
+        )
     }
     
     private func deleteTask() {

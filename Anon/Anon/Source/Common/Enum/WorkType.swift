@@ -101,61 +101,61 @@ enum WorkType: CaseIterable {
     case plant
     case dam
 
-    /// Short, clear main categories
+    /// Short, clear main categories (한국어로 통일 - CSV와 일치)
     var largeWork: String {
         switch self {
-        case .building: return "Buildings"
-        case .water: return "Water"
-        case .road: return "Roads"
-        case .misc: return "Misc"
-        case .bridge: return "Bridges"
-        case .river: return "River"
-        case .tunnel: return "Tunnels"
-        case .rail: return "Rail"
-        case .port: return "Ports"
-        case .retaining: return "Retaining"
-        case .enviro: return "Enviro"
-        case .plant: return "Plants"
-        case .dam: return "Dams"
+        case .building: return "건축물"
+        case .water: return "상하수도"
+        case .road: return "도로"
+        case .misc: return "기타"
+        case .bridge: return "교량"
+        case .river: return "하천"
+        case .tunnel: return "터널"
+        case .rail: return "철도"
+        case .port: return "항만"
+        case .retaining: return "옹벽 및 절토사면"
+        case .enviro: return "환경시설"
+        case .plant: return "산업생산시설"
+        case .dam: return "댐"
         }
     }
 
-    /// Short subcategories
+    /// Short subcategories (한국어로 통일 - CSV와 일치)
     var mediumWork: [String] {
         switch self {
         case .building:
             return [
-                "Apts", "Factories", "Offices", "Schools", "Shops",
-                "Warehouses", "Misc", "Halls", "Hotels",
-                "Houses", "Correction/Military", "Sports"
+                "공동주택", "공장", "업무시설", "교육연구시설", "근린생활시설",
+                "창고시설", "기타", "문화 및 집회시설", "숙박시설",
+                "단독주택", "교정 및 군사시설", "운동시설"
             ]
         case .water:
-            return ["Sewer", "Water", "Misc"]
+            return ["하수도", "상수도", "기타"]
         case .road:
-            return ["Roads", "Misc"]
+            return ["도로", "기타"]
         case .misc:
-            return ["Site Prep", "Simple Piping"]
+            return ["부지조성", "간이배관"]
         case .bridge:
-            return ["Road Bridges", "Misc", "Rail Bridges", "Deck Covers"]
+            return ["도로교량", "기타", "철도교량", "복개구조물"]
         case .river:
-            return ["Levees", "Culverts", "Pump Stations", "Gates", "Weirs"]
+            return ["제방통관", "관거수로", "배수펌프장", "수문", "보"]
         case .tunnel:
-            return ["Rail Tunnels", "Road Tunnels", "Misc", "Underpasses"]
+            return ["철도터널", "도로터널", "기타", "지하차도"]
         case .rail:
-            return ["Subways", "Rail/High-speed", "Misc"]
+            return ["지하철", "일반 및 고속철도", "기타"]
         case .port:
-            return ["Misc", "Breakwaters", "Berths", "Revetments", "Locks", "Quays"]
+            return ["기타", "방파제", "계류시설", "호안", "갑문", "피사지"]
         case .retaining:
-            return ["Walls", "Cut Slopes", "Misc"]
+            return ["옹벽", "절토사면", "기타"]
         case .enviro:
             return [
-                "Wastewater", "Pollution Control", "Incinerators",
-                "Testing Facilities", "Public Wastewater", "Greywater"
+                "하수처리시설", "환경오염방지시설", "소각장",
+                "수처리시험시설", "공공폐수처리시설", "중수도"
             ]
         case .plant:
-            return ["Petrochemical", "Steel"]
+            return ["석유화학공장", "제철공장"]
         case .dam:
-            return ["Water Supply", "Misc", "Multipurpose", "Flood Control"]
+            return ["용수전용댐", "기타", "다목적댐", "홍수전용댐"]
         }
     }
 }

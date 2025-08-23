@@ -67,7 +67,7 @@ struct WorkProgressView: View {
             // 값 표시 (0,10,…,90)
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text("\(Int(progress))")
-                    .font(Font.pretendard(type: .medium, size: 32))
+                    .font(Font.pretendard(type: .medium, size: 44))
                     .foregroundStyle(.neutral100)
                 Text("%")
                     .font(.h4)

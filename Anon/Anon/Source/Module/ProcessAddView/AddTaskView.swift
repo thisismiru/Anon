@@ -10,17 +10,14 @@ import SwiftData
 
 struct AddTaskView: View {
     // 모델 컨텍스트 (필요시 편집/삭제 등에 사용)
-    @EnvironmentObject var container: DIContainer
+//    @EnvironmentObject var container: DIContainer
     @Environment(\.modelContext) private var modelContext
-
-    // 오늘의 시작/끝 (로컬 캘린더 기준)
-    private let startOfToday: Date
-    private let endOfToday: Date
-
-    // 오늘 작업만, 시작 시간이 빠른 순으로 정렬
-    @Query private var tasks: [ConstructionTask]
-
-    init() {
+    var onTapAdd: () -> Void
+    
+    // ⚠️ 이미 init()을 따로 만들었다면 파라미터를 포함시키세요.
+    // (기본 memberwise init이 사라지기 때문)
+    init(onTapAdd: @escaping () -> Void = {}) {
+        self.onTapAdd = onTapAdd
         let cal = Calendar.current
         let now = Date()
         startOfToday = cal.startOfDay(for: now)
@@ -35,6 +32,13 @@ struct AddTaskView: View {
         )
     }
 
+    // 오늘의 시작/끝 (로컬 캘린더 기준)
+    private let startOfToday: Date
+    private let endOfToday: Date
+
+    // 오늘 작업만, 시작 시간이 빠른 순으로 정렬
+    @Query private var tasks: [ConstructionTask]
+
     var body: some View {
         ScrollView {
             VStack(spacing: 10) {
@@ -48,6 +52,8 @@ struct AddTaskView: View {
                     // TODO: 새 작업 추가 흐름으로 이동
                     container.navigationRouter.popToRooteView()
                     container.navigationRouter.push(to: .processAddView(taskId: ""))
+                    onTapAdd()          // ⬅️ 부모에게 “다시 작업 추가 흐름 시작해!” 신호
+                    
                 } label: {
                     ZStack {
                         Circle()
@@ -67,7 +73,7 @@ struct AddTaskView: View {
     }
 }
 
-private struct TaskCard: View {
+fileprivate struct TaskCard: View {
     let task: ConstructionTask
 
     private var timeString: String {

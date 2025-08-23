@@ -14,6 +14,7 @@ struct PreditcView: View {
     @Environment(\.modelContext) private var modelContext
 
     var body: some View {
+        // 이 뷰 갔다 버리고 이제 메인뷰와 연결해야함.
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
@@ -392,9 +393,9 @@ struct PreditcView: View {
     }
     
     private func riskColor(for value: Double) -> Color {
-        if value < 0.3 {
+        if value < 10.0 {
             return .green
-        } else if value < 0.7 {
+        } else if value < 20.0 {
             return .orange
         } else {
             return .red
