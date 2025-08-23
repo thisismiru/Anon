@@ -116,7 +116,7 @@ class PredictViewModel: ObservableObject {
             progressRate: Int(progressRate),
             workers: Int(selectedWorkerCount),
             startTime: accidentTime,
-            riskScore: Int(prediction * 100) // 0.0~1.0을 0~100으로 변환
+            riskScore: Int(prediction) // risk_index 값을 직접 사용
         )
         
         repository.addTask(
@@ -129,7 +129,7 @@ class PredictViewModel: ObservableObject {
             riskScore: newTask.riskScore
         )
         
-        print("💾 예측 결과를 작업으로 저장: 위험도 \(Int(prediction * 100))점")
+        print("💾 예측 결과를 작업으로 저장: 위험도 \(Int(prediction))점")
         errorMessage = nil
     }
     
@@ -179,6 +179,7 @@ class PredictViewModel: ObservableObject {
             if let riskValue = output.featureValue(for: "risk_index")?.doubleValue {
                 prediction = riskValue
                 print("✅ 예측 성공: risk_index = \(riskValue)")
+                print("📊 저장될 riskScore: \(Int(riskValue))")
             } else {
                 errorMessage = "risk_index 값을 찾을 수 없습니다."
                 print("❌ 예측 실패: risk_index 없음")
@@ -196,16 +197,16 @@ class PredictViewModel: ObservableObject {
 
 // MARK: - Enums
 enum ProcessType: String, CaseIterable {
-    case highAltitude = "고소"
-    case structure = "골조"
-    case excavation = "굴착"
-    case finishing = "마감"
-    case electrical = "설비"
-    case welding = "용접"
-    case transport = "운반"
-    case cutting = "절단"
-    case rebar = "철근"
-    case demolition = "해체"
+    case highAltitude = "고소, 접근"
+    case structure = "골조, 거푸집"
+    case excavation = "굴착, 조성"
+    case finishing = "마감, 도장"
+    case electrical = "설비, 전기"
+    case welding = "용접, 보수"
+    case transport = "운반, 하역"
+    case cutting = "절단, 가공"
+    case rebar = "철근, 연결"
+    case demolition = "해체, 철거"
     case concrete = "콘크리트 타설"
     case cleanup = "정리"
     case other = "기타"
@@ -228,5 +229,3 @@ enum ProcessType: String, CaseIterable {
         }
     }
 }
-
-// WorkerCount enum 제거 - 직접 Int64 값 사용
