@@ -14,6 +14,7 @@ struct PreditcView: View {
     @Environment(\.modelContext) private var modelContext
 
     var body: some View {
+        // 이 뷰 갔다 버리고 이제 메인뷰와 연결해야함.
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {

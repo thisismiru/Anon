@@ -228,5 +228,3 @@ enum ProcessType: String, CaseIterable {
         }
     }
 }
-
-// WorkerCount enum 제거 - 직접 Int64 값 사용
