@@ -22,6 +22,8 @@ enum CheckList {
     case concretePlacement
     case demolitionAndDismantling
     
+    // 공공데이터로 가능하면 갱신
+    
     var title: [CheckListText] {
         switch self {
         case .highAltitudeAndAccess:
@@ -51,7 +53,6 @@ enum CheckList {
 
         case .others:
             return [
-                CheckListText(title: "T.B.M(Tool Box Meeting)", content: "작업 전 실시 여부"),
                 CheckListText(title: "주변 도로 및 배수시설", content: "노면 폭·요철·결빙 제거, 안내 표지판 설치"),
                 CheckListText(title: "밀폐공간 작업", content: "산소·유해가스 측정, 환기, 감시인 배치")
             ]

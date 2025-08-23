@@ -28,8 +28,6 @@ struct WorkTypePickerView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("공사 종류를 선택해주세요")
-                .font(.title3).bold()
 
             LazyVGrid(columns: columns, alignment: .leading, spacing: 12) {
                 ForEach(visibleItems) { chip in
@@ -40,10 +38,10 @@ struct WorkTypePickerView: View {
                     } label: {
                         HStack(spacing: 8) {
                             Text(chip.title)
-                                .font(.subheadline).bold()
+                                .font(.b1)
+                                .foregroundStyle(.neutral70)
                             if selectedID == chip.id {
-                                Image(systemName: "xmark")
-                                    .font(.caption2.weight(.bold))
+                                Image(.workXIcon)
                             }
                         }
                         .padding(.horizontal, 14).padding(.vertical, 10)
@@ -56,7 +54,6 @@ struct WorkTypePickerView: View {
                                 .stroke(selectedID == chip.id ? Color.blue : Color.gray.opacity(0.35), lineWidth: 1)
                         )
                     }
-                    .buttonStyle(.plain)
                     .transition(.asymmetric(insertion: .scale.combined(with: .opacity),
                                             removal: .opacity.combined(with: .scale)))
                 }
