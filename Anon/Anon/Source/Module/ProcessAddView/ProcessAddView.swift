@@ -48,12 +48,17 @@ enum OnboardingStep: Int, CaseIterable {
 
 // 2) 컨테이너
 struct ProcessAddView: View {
+    @EnvironmentObject var container: DIContainer
     @State private var step: OnboardingStep = .workType
     
+    // ✅ SwiftData 컨텍스트
+        @Environment(\.modelContext) private var modelContext
+    
     // 수집 데이터 (필요한 것만 추가/수정)
-    @State private var selectedWorkType: String? = nil
+    @State private var selectedLargeType: WorkType? = nil   // ⬅️ 대분류
+    @State private var selectedWorkType: String? = nil      // ⬅️ 소분류
     @State private var selectedProcess: WorkProcess? = nil
-    @State private var progress: Double = 0
+    @State private var progress: Int = 0
     @State private var headcount: Int? = nil
     @State private var startTime: Date = .now
     
@@ -91,7 +96,10 @@ struct ProcessAddView: View {
                     ZStack {
                         switch step {
                         case .workType:
-                            WorkTypeView(selectedWorkType: $selectedWorkType)
+                            WorkTypeView(
+                                selectedLargeType: $selectedLargeType,
+                                selectedWorkType: $selectedWorkType
+                            )
                         case .workProcess:
                             WorkProcessView(selectedProcess: $selectedProcess)
                         case .workProgress:
@@ -105,7 +113,7 @@ struct ProcessAddView: View {
                             StartTimeView(startTime: $startTime)
                         case .addTask:
                             // WorkAddTaskView …
-                            EmptyView()
+                            AddTaskView()
                         }
                     }
                     
@@ -134,6 +142,11 @@ struct ProcessAddView: View {
             saveCurrentEntry()
         }
         
+        if step == .addTask {
+            container.navigationRouter.popToRooteView()
+            container.navigationRouter.push(to: .mainView)
+        }
+        
         guard let i = OnboardingStep.allCases.firstIndex(of: step),
               i < OnboardingStep.allCases.count - 1 else { return }
         step = OnboardingStep.allCases[i + 1]
@@ -145,6 +158,33 @@ struct ProcessAddView: View {
     
     // SwiftData 저장
     private func saveCurrentEntry() {
+        guard
+            let large = selectedLargeType,         // WorkType
+            let medium = selectedWorkType,         // String
+            let process = selectedProcess,         // WorkProcess
+            let workers = headcount                // Int
+        else { return }
+
+        let task = ConstructionTask(
+            category: large.largeWork,            // 대분류 이름 (String)
+            subcategory: medium,                  // 소분류 (String)
+            process: process.title,               // 작업 프로세스 (String)
+            progressRate: progress,               // 0~100
+            workers: workers,                     // 투입 인원
+            startTime: startTime,                 // Date
+            riskScore: 88                         // 고정값
+        )
+
+        modelContext.insert(task)
+
+//         필요하다면 즉시 저장 (기본적으로 자동저장됨)
+         do {
+             try modelContext.save()
+             print("성공했습니다.")
+             print(startTime)
+         } catch {
+             print("Save error: \(error)")
+         }
     }
 }
 

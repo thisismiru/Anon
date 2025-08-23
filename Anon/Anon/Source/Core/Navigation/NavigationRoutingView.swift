@@ -18,8 +18,8 @@ struct NavigationRoutingView: View {
             switch destination {
             case .mainView:
                 MainView(container: _container)
-            case .addTaskView:
-                ContentView(container: _container)
+            case .processAddView:
+                ProcessAddView(container: _container)
             case .taskRiskListView:
                 TaskRiskListView()
             case .taskDetailView(let taskId):

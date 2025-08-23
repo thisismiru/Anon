@@ -13,13 +13,13 @@ struct StartTimeView: View {
             )
             .datePickerStyle(.wheel)
             .labelsHidden()
-            .frame(maxWidth: 199) // 휠 너비
+            .frame(maxWidth: 320) // 휠 너비
             .padding(.vertical, 8)
             .background(
                 .ultraThinMaterial,
                 in: RoundedRectangle(cornerRadius: 24, style: .continuous)
             )
-            .shadow(color: .black.opacity(0.1), radius: 30, x: 0, y: 10)
+            .shadow(color: .black.opacity(0.08), radius: 24, y: 8)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top) // 가운데에 놓고 싶으면 .center
         .padding(.top, 8)
