@@ -6,12 +6,12 @@
 //
 
 enum WeatherType: String, CaseIterable {
-    case blizzard = "강설"
-    case downpour = "강우"
-    case wind = "강풍"
-    case clear = "맑음"
-    case fog = "안개"
-    case cloud = "흐림"
+    case blizzard = "blizzard"
+    case downpour = "downpour"
+    case wind = "wind"
+    case clear = "clear"
+    case fog = "fog"
+    case cloud = "cloud"
     
     func getKoreanName() -> String {
         switch self {

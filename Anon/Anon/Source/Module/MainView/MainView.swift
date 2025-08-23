@@ -6,21 +6,44 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct MainView: View {
     @EnvironmentObject var container: DIContainer
     @EnvironmentObject var appFlowViewModel: AppFlowViewModel
+    @Environment(\.modelContext) private var modelContext
     
     @State private var tasks: [ConstructionTask] = []
+    @State private var showingResetAlert = false
     
     var body: some View {
         NavigationStack(path: $container.navigationRouter.destination) {
-            VStack {
+            VStack(spacing: 16) {
                 Text("오늘의 위험도 70%")
-            }
-            .background(.yellow)
-            .onTapGesture {
-                container.navigationRouter.push(to: .taskRiskListView)
+                    .background(.yellow)
+                    .onTapGesture {
+                        container.navigationRouter.push(to: .taskRiskListView)
+                    }
+                
+                // SwiftData 초기화 버튼
+                Button(action: {
+                    showingResetAlert = true
+                }) {
+                    HStack {
+                        Image(systemName: "trash.circle.fill")
+                            .foregroundColor(.red)
+                        Text("SwiftData 초기화")
+                            .foregroundColor(.red)
+                            .fontWeight(.semibold)
+                    }
+                    .padding()
+                    .background(Color.red.opacity(0.1))
+                    .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.red.opacity(0.3), lineWidth: 1)
+                    )
+                }
             }
             
             List(tasks) { task in
@@ -56,6 +79,32 @@ struct MainView: View {
             }
         }
         .background(.red)
+        .alert("SwiftData 초기화", isPresented: $showingResetAlert) {
+            Button("취소", role: .cancel) { }
+            Button("초기화", role: .destructive) {
+                resetSwiftData()
+            }
+        } message: {
+            Text("모든 저장된 작업 데이터가 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.")
+        }
+    }
+    
+    // MARK: - SwiftData 초기화
+    private func resetSwiftData() {
+        do {
+            // 모든 ConstructionTask 삭제
+            try modelContext.delete(model: ConstructionTask.self)
+            
+            // 변경사항 저장
+            try modelContext.save()
+            
+            // 로컬 tasks 배열도 초기화
+            tasks.removeAll()
+            
+            print("SwiftData 초기화 완료")
+        } catch {
+            print("SwiftData 초기화 실패: \(error)")
+        }
     }
 }
 
