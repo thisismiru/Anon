@@ -294,6 +294,11 @@ struct ProcessAddView: View {
             try modelContext.save()
             print("✅ 작업 저장 성공! 위험도: \(predictedRiskScore)점")
             print("📅 시작 시간: \(startTime)")
+            
+            // 테스크 저장 완료 후 메인 화면으로 이동
+            DispatchQueue.main.async {
+                appFlowViewModel.appState = .main
+            }
         } catch {
             print("❌ Save error: \(error)")
         }

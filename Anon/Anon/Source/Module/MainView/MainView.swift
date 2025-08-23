@@ -9,33 +9,33 @@ struct MainView: View {
     // 오늘 범위
     private let startOfToday: Date
     private let endOfToday: Date
-
+    
     // 오늘 작업들 – 시작시간 오름차순
     @Query private var todayTasks: [ConstructionTask]
-
+    
     // 오늘 작업들 – riskScore 내림차순 (순위용)
     @Query private var rankedToday: [ConstructionTask]
-
+    
     // ✅ 탭해서 펼친 카드 추적
     @State private var expandedTaskID: UUID? = nil
     
     // ✅ SwiftData 초기화 관련
     @State private var showingResetAlert: Bool = false
-
+    
     init() {
         let cal = Calendar.current
         let start = cal.startOfDay(for: Date())
         let end   = cal.date(byAdding: .day, value: 1, to: start)!   // 내일 0시
         self.startOfToday = start
         self.endOfToday = end
-
+        
         _todayTasks = Query(
             filter: #Predicate<ConstructionTask> {
                 $0.startTime >= start && $0.startTime < end
             },
             sort: [SortDescriptor(\.startTime, order: .forward)]
         )
-
+        
         _rankedToday = Query(
             filter: #Predicate<ConstructionTask> {
                 $0.startTime >= start && $0.startTime < end
@@ -43,19 +43,19 @@ struct MainView: View {
             sort: [SortDescriptor(\.riskScore, order: .reverse)]
         )
     }
-
-    // ✅ topTwo: 오늘 작업을 riskScore 순으로 2개
-    private var topTwo: [ConstructionTask] {
-        Array(rankedToday.prefix(2))
+    
+    // ✅ topThree: 오늘 작업을 riskScore 순으로 3개
+    private var topThree: [ConstructionTask] {
+        Array(rankedToday.prefix(3))
     }
-
+    
     // ✅ averageRisk: 오늘 작업들의 riskScore 평균
     private var averageRisk: Int {
         guard !todayTasks.isEmpty else { return 0 }
         let total = todayTasks.reduce(0) { $0 + $1.riskScore }
         return Int((Double(total) / Double(todayTasks.count)).rounded())
     }
-
+    
     // 시간 포맷터
     static let timeFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -66,22 +66,18 @@ struct MainView: View {
     
     var body: some View {
         NavigationStack(path: $container.navigationRouter.destination) {
-            
             ZStack {
-                
                 Color(hex: "F2F2F8")
-                
+                    .ignoresSafeArea(edges: .all)
                 VStack {
                     // ─────────────────────────────────────────────────────
                     // 기존 상단 헤더 (수정 없음)
                     HStack(spacing: 8) {
                         Image(.logo)
                             .frame(width: 23, height: 26)
-                        
                         Text("ANON")
                             .font(.arialBlack(size: 22))
                     }
-                    
                     ScrollView { // 내용이 늘어나므로 스크롤 가능
                         VStack(spacing: 16) {
                             
@@ -92,16 +88,33 @@ struct MainView: View {
                                         .foregroundStyle(.neutral70)
                                     
                                     VStack(spacing: 4) {
-                                        (
-                                            Text("1. ").font(.b1).foregroundStyle(.neutral100) +
-                                            Text(topTwo.first?.process ?? "—")
-                                                .font(.b1).foregroundStyle(.neutral100)
-                                        )
-                                        (
-                                            Text("2. ").font(.b1).foregroundStyle(.neutral100) +
-                                            Text(topTwo.dropFirst().first?.process ?? "—")
-                                                .font(.b1).foregroundStyle(.neutral100)
-                                        )
+                                        // 1등: 가장 위험한 작업
+                                        HStack(spacing: 0) {
+                                            Text("1. ")
+                                                .font(.b1)
+                                                .foregroundStyle(.neutral100)
+                                            Text(topThree.first?.process ?? "—")
+                                                .font(.b1)
+                                                .foregroundStyle(.neutral100)
+                                        }
+                                        // 2등: 두 번째로 위험한 작업
+                                        HStack(spacing: 0) {
+                                            Text("2. ")
+                                                .font(.b1)
+                                                .foregroundStyle(.neutral100)
+                                            Text(topThree.dropFirst().first?.process ?? "—")
+                                                .font(.b1)
+                                                .foregroundStyle(.neutral100)
+                                        }
+                                        // 3등: 세 번째로 위험한 작업
+                                        HStack(spacing: 0) {
+                                            Text("3. ")
+                                                .font(.b1)
+                                                .foregroundStyle(.neutral100)
+                                            Text(topThree.dropFirst(2).first?.process ?? "—")
+                                                .font(.b1)
+                                                .foregroundStyle(.neutral100)
+                                        }
                                     }
                                 }
                                 .padding(.vertical, 24)
@@ -128,6 +141,14 @@ struct MainView: View {
                                 }
                                 .padding(.vertical, 24)
                                 .padding(.trailing, 24)
+                            }
+                            .onTapGesture {
+                                container.navigationRouter.push(to: .taskRiskListView)
+                            }
+                            .navigationDestination(for: NavigationDestination.self) { destination in
+                                NavigationRoutingView(destination: destination)
+                                    .environmentObject(container)
+                                    .environmentObject(appFlowViewModel)
                             }
                             
                             
@@ -210,6 +231,22 @@ struct MainView: View {
                 .environmentObject(container)
                 .environmentObject(appFlowViewModel)
         }
+        .overlay(
+            // 플러스 버튼을 우측 하단에 배치
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    PlusButton(action: {
+                        // 플러스 버튼을 누르면 테스크 추가 화면으로 이동
+                        appFlowViewModel.appState = .addTask
+                    })
+                    .frame(width: 48, height: 48)
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 20)
+                }
+            }
+        )
     }
     
     // MARK: - SwiftData 초기화
@@ -277,8 +314,10 @@ private struct TaskRowCard: View {
                             }
                         }
                 } else {
-                    // 진행 개수 배지 (샘플: “2 / 3” 같은 모양)
-                    Text("\(max(1, task.progressRate/40)) / \(max(1, task.progressRate/30))")
+                    // 진행 개수 배지 (샘플: "2 / 3" 같은 모양)
+                    let progressNumerator = max(1, task.progressRate / 40)
+                    let progressDenominator = max(1, task.progressRate / 30)
+                    Text("\(progressNumerator) / \(progressDenominator)")
                         .font(.b2)
                         .foregroundStyle(.neutral80)
                         .padding(.horizontal, 14)
@@ -325,7 +364,7 @@ private struct TaskRowCard: View {
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
-
+        
         .background(
             RoundedRectangle(cornerRadius: 12).fill(Color.neutral10)
         )
