@@ -174,12 +174,17 @@ struct PreditcView: View {
                                 .font(.headline)
                                 .foregroundColor(.primary)
                             
-                            Picker("작업자 수", selection: $viewModel.selectedWorkerCount) {
-                                ForEach(WorkerCount.allCases, id: \.self) { count in
-                                    Text(count.displayName).tag(count)
-                                }
+                            HStack {
+                                Slider(value: Binding(
+                                    get: { Double(viewModel.selectedWorkerCount) },
+                                    set: { viewModel.selectedWorkerCount = Int64($0) }
+                                ), in: 1...500, step: 1)
+                                Text("\(viewModel.selectedWorkerCount)명")
+                                    .font(.title2)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.purple)
+                                    .frame(width: 60)
                             }
-                            .pickerStyle(.segmented)
                         }
                         .padding()
                         .background(Color(.systemGray6))
@@ -220,7 +225,7 @@ struct PreditcView: View {
                         viewModel.selectedMediumWork = "공동주택"
                         viewModel.selectedProcess = .cleanup
                         viewModel.progressRate = 30
-                        viewModel.selectedWorkerCount = .underNineteen
+                        viewModel.selectedWorkerCount = 500
                         print("🧪 === 테스트 값 설정 완료 ===")
                         Task {
                             await viewModel.predictRisk()

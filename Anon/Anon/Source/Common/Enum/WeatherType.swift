@@ -6,12 +6,12 @@
 //
 
 enum WeatherType: String, CaseIterable {
-    case blizzard = "Blizzard"
-    case downpour = "Downpour"
-    case clear = "Clear"
-    case wind = "Wind"
-    case fog = "Fog"
-    case cloud = "Cloud"
+    case blizzard = "강설"
+    case downpour = "강우"
+    case wind = "강풍"
+    case clear = "맑음"
+    case fog = "안개"
+    case cloud = "흐림"
     
     func getKoreanName() -> String {
         switch self {
@@ -19,10 +19,10 @@ enum WeatherType: String, CaseIterable {
             return "강설"
         case .downpour:
             return "강우"
-        case .clear:
-            return "맑음"
         case .wind:
             return "강풍"
+        case .clear:
+            return "맑음"
         case .fog:
             return "안개"
         case .cloud:
@@ -30,21 +30,21 @@ enum WeatherType: String, CaseIterable {
         }
     }
     
-    // ANON 모델용 변환
+    // ANON 모델용 변환 (CSV 데이터와 정확히 일치)
     func toModelValue() -> String {
         switch self {
         case .blizzard:
-            return "snowy"
+            return "강설"
         case .downpour:
-            return "rainy"
-        case .clear:
-            return "sunny"
+            return "강우"
         case .wind:
-            return "windy"
+            return "강풍"
+        case .clear:
+            return "맑음"
         case .fog:
-            return "foggy"
+            return "안개"
         case .cloud:
-            return "cloudy"
+            return "흐림"
         }
     }
 }

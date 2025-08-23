@@ -17,9 +17,9 @@ class PredictViewModel: ObservableObject {
     @Published var humidity: Double = 60.0
     @Published var selectedWorkType: WorkType = .building
     @Published var selectedMediumWork: String = "공동주택"
-    @Published var selectedProcess: ProcessType = .foundation
+    @Published var selectedProcess: ProcessType = .structure
     @Published var progressRate: Double = 30.0
-    @Published var selectedWorkerCount: WorkerCount = .underNineteen
+    @Published var selectedWorkerCount: Int64 = 19
     
     @Published var prediction: Double = 0.0
     @Published var isLoading = false
@@ -38,7 +38,7 @@ class PredictViewModel: ObservableObject {
     // MARK: - Model Loading
     private func loadModel() {
         do {
-            model = try ANON()
+            model = try ANON(configuration: MLModelConfiguration())
             print("✅ ANON 모델 로드 성공")
         } catch {
             print("❌ ANON 모델 로드 실패: \(error)")
@@ -66,7 +66,7 @@ class PredictViewModel: ObservableObject {
         // process를 기반으로 ProcessType 설정
         updateProcessTypeFromTask(task)
         
-        // workers를 기반으로 WorkerCount 설정
+        // workers를 기반으로 작업자 수 설정
         updateWorkerCountFromTask(task)
         
         print("✅ 작업 선택됨: \(task.category)/\(task.subcategory) - \(task.process)")
@@ -96,23 +96,8 @@ class PredictViewModel: ObservableObject {
     }
     
     private func updateWorkerCountFromTask(_ task: ConstructionTask) {
-        // workers 수를 기반으로 WorkerCount 찾기
-        switch task.workers {
-        case 1...19:
-            selectedWorkerCount = .underNineteen
-        case 20...49:
-            selectedWorkerCount = .twentyToFortyNine
-        case 50...99:
-            selectedWorkerCount = .fiftyToNinetyNine
-        case 100...299:
-            selectedWorkerCount = .oneHundredToTwoHundredNinetyNine
-        case 300...499:
-            selectedWorkerCount = .threeHundredToFourHundredNinetyNine
-        case 500...:
-            selectedWorkerCount = .fiveHundredPlus
-        default:
-            selectedWorkerCount = .underNineteen
-        }
+        // workers 수를 직접 설정
+        selectedWorkerCount = Int64(task.workers)
     }
     
     func savePredictionAsTask(to context: ModelContext) {
@@ -129,7 +114,7 @@ class PredictViewModel: ObservableObject {
             subcategory: selectedMediumWork,
             process: selectedProcess.rawValue,
             progressRate: Int(progressRate),
-            workers: selectedWorkerCount.toWorkerCount(),
+            workers: Int(selectedWorkerCount),
             startTime: accidentTime,
             riskScore: Int(prediction * 100) // 0.0~1.0을 0~100으로 변환
         )
@@ -149,7 +134,7 @@ class PredictViewModel: ObservableObject {
     }
     
     @MainActor
-    func predictRisk() async {
+    func predictRisk() {
         guard let model = model else {
             errorMessage = "모델이 로드되지 않았습니다."
             return
@@ -158,106 +143,52 @@ class PredictViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         
-        // 입력값 준비
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        let accidentTimeString = dateFormatter.string(from: accidentTime)
-        
+        // 변환 함수 사용
         let weatherString = selectedWeather.toModelValue()
         let constructionTypeString = "\(selectedWorkType.largeWork)/\(selectedMediumWork)"
         let processString = selectedProcess.rawValue
-        let workerCountString = selectedWorkerCount.rawValue
+        let workerCountInt64 = selectedWorkerCount
         
         // 입력값 로그 출력
         print("🔍 === 예측 입력값 ===")
-        print("  - accident_time: \(accidentTimeString)")
         print("  - weather: \(weatherString)")
         print("  - temperature: \(self.temperature)")
         print("  - humidity: \(self.humidity)")
         print("  - construction_type: \(constructionTypeString)")
         print("  - process: \(processString)")
         print("  - progress_rate: \(Int64(self.progressRate))")
-        print("  - worker_count: \(workerCountString)")
-        print("  - selectedWeather: \(selectedWeather)")
-        print("  - selectedWorkType: \(selectedWorkType)")
-        print("  - selectedMediumWork: \(selectedMediumWork)")
-        print("  - selectedProcess: \(selectedProcess)")
-        print("  - selectedWorkerCount: \(selectedWorkerCount)")
+        print("  - worker_count: \(workerCountInt64)")
         print("=========================")
         
-        // 예측 실행 (async/await 방식)
         do {
             print("🚀 모델 예측 시작...")
             
-            let output = try await model.prediction(
-                accident_time: accidentTimeString,
+            let output = try model.prediction(
                 weather: weatherString,
-                temperature: self.temperature,
-                humidity: self.humidity,
+                temperature: temperature,
+                humidity: humidity,
                 construction_type: constructionTypeString,
                 process: processString,
-                progress_rate: Int64(self.progressRate),
-                worker_count: workerCountString
+                progress_rate: Int64(progressRate),
+                worker_count: workerCountInt64
             )
             
             print("✅ 모델 예측 완료!")
+            print("🔍 출력 피처: \(Array(output.featureNames))")
             
-            // 모델 출력의 모든 피처를 확인
-            print("🔍 === 모델 출력 피처들 ===")
-            print("  - 전체 피처 개수: \(output.featureNames.count)")
-            print("  - 피처 이름들: \(Array(output.featureNames))")
-            
-            for featureName in output.featureNames {
-                if let featureValue = output.featureValue(for: featureName) {
-                    print("  - \(featureName): \(featureValue) (타입: \(type(of: featureValue)))")
-                } else {
-                    print("  - \(featureName): nil")
-                }
-            }
-            print("=========================")
-            
-            // ANONOutput의 risk_index 속성으로 직접 접근
-            print("🎯 risk_index 속성 접근 시도...")
-            do {
-                let riskValue = output.risk_index
-                self.prediction = riskValue
+            if let riskValue = output.featureValue(for: "risk_index")?.doubleValue {
+                prediction = riskValue
                 print("✅ 예측 성공: risk_index = \(riskValue)")
-            } catch {
-                // risk_index 속성 접근 실패 시 fallback
-                print("⚠️ risk_index 속성 접근 실패: \(error)")
-                print("⚠️ 피처 이름으로 시도...")
-                
-                if let riskValue = output.featureValue(for: "risk_index")?.doubleValue {
-                    self.prediction = riskValue
-                    print("✅ 피처 이름으로 찾음: risk_index = \(riskValue)")
-                } else {
-                    // 다른 가능한 피처 이름들 시도
-                    let possibleNames = ["risk_index", "risk", "prediction", "output", "result"]
-                    var foundValue: Double?
-                    
-                    for name in possibleNames {
-                        if let value = output.featureValue(for: name)?.doubleValue {
-                            foundValue = value
-                            print("✅ 다른 이름으로 찾음: \(name) = \(value)")
-                            break
-                        }
-                    }
-                    
-                    if let finalValue = foundValue {
-                        self.prediction = finalValue
-                    } else {
-                        self.errorMessage = "risk_index 피처를 찾을 수 없습니다. 출력된 피처: \(Array(output.featureNames))"
-                        print("❌ 예측 실패: 사용 가능한 피처 = \(Array(output.featureNames))")
-                    }
-                }
+            } else {
+                errorMessage = "risk_index 값을 찾을 수 없습니다."
+                print("❌ 예측 실패: risk_index 없음")
             }
-            
         } catch {
-            print("❌ 모델 예측 실패: \(error)")
-            self.errorMessage = "예측 실패: \(error.localizedDescription)"
+            errorMessage = "예측 실패: \(error.localizedDescription)"
+            print("❌ 예측 실패 오류: \(error)")
         }
         
-        self.isLoading = false
+        isLoading = false
     }
     
 
@@ -265,56 +196,37 @@ class PredictViewModel: ObservableObject {
 
 // MARK: - Enums
 enum ProcessType: String, CaseIterable {
-    case demolition = "demolition"
-    case electrical = "electrical"
-    case transportation = "transportation"
-    case rebarConnection = "rebar_connection"
-    case concretePouring = "concrete_pouring"
-    case foundation = "foundation"
-    case cleanup = "cleanup"
-    case other = "other"
+    case highAltitude = "고소"
+    case structure = "골조"
+    case excavation = "굴착"
+    case finishing = "마감"
+    case electrical = "설비"
+    case welding = "용접"
+    case transport = "운반"
+    case cutting = "절단"
+    case rebar = "철근"
+    case demolition = "해체"
+    case concrete = "콘크리트 타설"
+    case cleanup = "정리"
+    case other = "기타"
     
     var displayName: String {
         switch self {
-        case .demolition: return "해체, 철거"
+        case .highAltitude: return "고소, 접근"
+        case .structure: return "골조, 거푸집"
+        case .excavation: return "굴착, 조성"
+        case .finishing: return "마감, 도장"
         case .electrical: return "설비, 전기"
-        case .transportation: return "운반, 하역"
-        case .rebarConnection: return "철근, 연결"
-        case .concretePouring: return "콘크리트 타설"
-        case .foundation: return "기초공사"
+        case .welding: return "용접, 보수"
+        case .transport: return "운반, 하역"
+        case .cutting: return "절단, 가공"
+        case .rebar: return "철근, 연결"
+        case .demolition: return "해체, 철거"
+        case .concrete: return "콘크리트 타설"
         case .cleanup: return "정리"
         case .other: return "기타"
         }
     }
 }
 
-enum WorkerCount: String, CaseIterable {
-    case underNineteen = "19인 미만"
-    case twentyToFortyNine = "20~49인"
-    case fiftyToNinetyNine = "50~99인"
-    case oneHundredToTwoHundredNinetyNine = "100~299인"
-    case threeHundredToFourHundredNinetyNine = "300~499인"
-    case fiveHundredPlus = "500인 이상"
-    
-    var displayName: String {
-        switch self {
-        case .underNineteen: return "19인 미만"
-        case .twentyToFortyNine: return "20~49인"
-        case .fiftyToNinetyNine: return "50~99인"
-        case .oneHundredToTwoHundredNinetyNine: return "100~299인"
-        case .threeHundredToFourHundredNinetyNine: return "300~499인"
-        case .fiveHundredPlus: return "500인 이상"
-        }
-    }
-    
-    func toWorkerCount() -> Int {
-        switch self {
-        case .underNineteen: return 10  // 1~19인의 중간값
-        case .twentyToFortyNine: return 35  // 20~49인의 중간값
-        case .fiftyToNinetyNine: return 75
-        case .oneHundredToTwoHundredNinetyNine: return 200
-        case .threeHundredToFourHundredNinetyNine: return 400
-        case .fiveHundredPlus: return 500
-        }
-    }
-}
+// WorkerCount enum 제거 - 직접 Int64 값 사용
