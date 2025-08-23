@@ -43,7 +43,7 @@ struct SplashView: View {
         .ignoresSafeArea()
         .background(.blue50)
         .task {
-            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            try? await Task.sleep(for: .seconds(2.5))
             appFlowViewModel.appState = .main
         }
     }

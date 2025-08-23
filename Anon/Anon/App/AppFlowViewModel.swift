@@ -21,7 +21,7 @@ class AppFlowViewModel: ObservableObject {
     
     init(context: ModelContext) {
         self.context = context
-        checkInitialState()
+        self.appState = .splash
         scheduleMidnightReset()
     }
     
