@@ -104,6 +104,7 @@ struct BestMarker: View {
             Text("Best")
                 .font(.b2)
                 .padding(.vertical, 4)
+                .padding(.horizontal, 16)
                 .background(Color.neutral70)
                 .cornerRadius(20)
                 .foregroundStyle(.neutral0)
