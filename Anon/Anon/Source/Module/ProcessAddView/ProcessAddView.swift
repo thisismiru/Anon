@@ -95,9 +95,9 @@ struct ProcessAddView: View {
                     // ── 고정 헤더(변하지 않음) ───────────────────────────────
                     VStack(alignment: .leading, spacing: 8) {
                         Text(step.title)
-                            .font(.title3.bold())
+                            .font(.h3)
                         Text(step.text)
-                            .font(.subheadline)
+                            .font(.b1)
                             .foregroundStyle(.secondary)
                     }
                     .safeAreaPadding(.horizontal, 16)
