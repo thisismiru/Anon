@@ -12,12 +12,7 @@ struct CustomProgressBar: View {
     private let maxValue: Int
     
     private var barColor: Color {
-        let percentage = Double(value) / Double(maxValue)
-        switch percentage {
-        case 0.8...: return .error
-        case 0.3..<0.8: return .warning
-        default: return .success
-        }
+        Color.riskColor(for: value)
     }
     
     /// CustomProgressBar

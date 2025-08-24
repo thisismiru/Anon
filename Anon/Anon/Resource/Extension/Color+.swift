@@ -10,9 +10,9 @@ import SwiftUICore
 extension Color {
     static func riskColor(for score: Int) -> Color {
         switch score {
-        case 0..<20:  return .green   // 안전
-        case 20..<40: return .yellow  // 주의
-        default:      return .red     // 위험
+        case 0..<20:  return .success   // 안전
+        case 20..<40: return .warning  // 주의
+        default:      return .error     // 위험
         }
     }
 }
