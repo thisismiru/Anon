@@ -248,6 +248,29 @@ extension WorkProcess {
         }
     }
 }
+
+extension WorkProcess {
+    static func from(_ string: String) -> WorkProcess? {
+        switch string.lowercased() {
+        case "height":        return .height
+        case "structure":     return .structure
+        case "excavation":    return .excavation
+        case "finishing":     return .finishing
+        case "electrical":    return .electrical
+        case "welding":       return .welding
+        case "transport":     return .transport
+        case "housekeeping":  return .housekeeping
+        case "cutting":       return .cutting
+        case "rebar":         return .rebar
+        case "concrete":      return .concrete
+        case "demolition":    return .demolition
+        case "others":        return .others
+        default:              return nil
+        }
+    }
+}
+
+
 //
 //import Foundation
 //
@@ -265,9 +288,9 @@ extension WorkProcess {
 //    case rebarAndConnection
 //    case concretePlacement
 //    case demolitionAndDismantling
-//    
+//
 //    // 공공데이터로 가능하면 갱신
-//    
+//
 //    var title: String {
 //        switch self {
 //        case .highAltitudeAndAccess:
@@ -298,7 +321,7 @@ extension WorkProcess {
 //            return "기타"
 //        }
 //    }
-//    
+//
 //    var checkList: [CheckListText] {
 //        switch self {
 //        case .highAltitudeAndAccess:

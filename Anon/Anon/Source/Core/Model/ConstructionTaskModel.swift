@@ -36,3 +36,10 @@ class ConstructionTask {
         self.riskScore = riskScore
     }
 }
+
+extension ConstructionTask {
+    /// process(String)을 WorkProcess enum으로 변환
+    var workProcess: WorkProcess {
+        return WorkProcess.from(process) ?? .others
+    }
+}

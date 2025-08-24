@@ -69,148 +69,62 @@ struct MainView: View {
             ZStack {
                 Color(hex: "F2F2F8")
                     .ignoresSafeArea(edges: .all)
-                VStack {
-                    // ─────────────────────────────────────────────────────
-                    // 기존 상단 헤더 (수정 없음)
-                    HStack(spacing: 8) {
-                        Image(.logo)
-                            .frame(width: 23, height: 26)
-                        Text("ANON")
-                            .font(.arialBlack(size: 22))
-                    }
-                    ScrollView { // 내용이 늘어나므로 스크롤 가능
+                VStack(spacing: 16) {
+                    LogoHeaderSection()
+                    
+                    ScrollView {
                         VStack(spacing: 16) {
-                            
-                            HStack(spacing: 20) {
-                                VStack(spacing: 29) {
-                                    Text("Tasks to watch")
-                                        .font(.labelM)
-                                        .foregroundStyle(.neutral70)
-                                    
-                                    VStack(spacing: 4) {
-                                        // 1등: 가장 위험한 작업
-                                        HStack(spacing: 0) {
-                                            Text("1. ")
-                                                .font(.b1)
-                                                .foregroundStyle(.neutral100)
-                                            Text(topThree.first?.process ?? "—")
-                                                .font(.b1)
-                                                .foregroundStyle(.neutral100)
+                            RiskScoreSection(
+                                            topThree: topThree,
+                                            averageRisk: averageRisk
+                                        ) {
+                                            container.navigationRouter.push(to: .taskRiskListView)
                                         }
-                                        // 2등: 두 번째로 위험한 작업
-                                        HStack(spacing: 0) {
-                                            Text("2. ")
-                                                .font(.b1)
-                                                .foregroundStyle(.neutral100)
-                                            Text(topThree.dropFirst().first?.process ?? "—")
-                                                .font(.b1)
-                                                .foregroundStyle(.neutral100)
+                                        .padding(.horizontal, 16)
+                                        .padding(.bottom, 16)
+                                        .navigationDestination(for: NavigationDestination.self) { destination in
+                                            NavigationRoutingView(destination: destination)
+                                                .environmentObject(container)
+                                                .environmentObject(appFlowViewModel)
                                         }
-                                        // 3등: 세 번째로 위험한 작업
-                                        HStack(spacing: 0) {
-                                            Text("3. ")
-                                                .font(.b1)
-                                                .foregroundStyle(.neutral100)
-                                            Text(topThree.dropFirst(2).first?.process ?? "—")
-                                                .font(.b1)
-                                                .foregroundStyle(.neutral100)
-                                        }
-                                    }
-                                }
-                                .padding(.vertical, 24)
-                                .padding(.leading, 24)
-                                
-                                Rectangle()
-                                    .frame(width: 98, height: 1)
-                                    .foregroundStyle(.neutral20)
-                                
-                                VStack(spacing: 43) {
-                                    Text("Today’s Risk Score")
-                                        .font(.labelM)
-                                        .foregroundStyle(.neutral70)
-                                    
-                                    HStack(spacing: 4) {
-                                        Text("\(averageRisk)")
-                                            .font(.pretendard(type: .medium, size: 48))
-                                            .foregroundStyle(.neutral100)
                                         
-                                        Text("pts")
-                                            .font(.h4)
-                                            .foregroundStyle(.neutral100)
-                                    }
-                                }
-                                .padding(.vertical, 24)
-                                .padding(.trailing, 24)
-                            }
-                            .onTapGesture {
-                                container.navigationRouter.push(to: .taskRiskListView)
-                            }
-                            .navigationDestination(for: NavigationDestination.self) { destination in
-                                NavigationRoutingView(destination: destination)
-                                    .environmentObject(container)
-                                    .environmentObject(appFlowViewModel)
-                            }
                             
                             
                             // ─────────────────────────────────────────────────────
                             
-                            // ⬇️ [추가] Today’s Checklist
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("Today’s Checklist")
+
+                            Text("Today’s Checklist")
                                     .font(.labelM)
                                     .foregroundStyle(.neutral70)
+                                    .padding(.horizontal, 16)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                 
-                                VStack(spacing: 12) {
-                                    ForEach(todayTasks) { task in
-                                        TaskRowCard(
-                                            task: task,
-                                            isExpanded: Binding(
-                                                get: { expandedTaskID == task.id },
-                                                set: { newValue in
-                                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                                        expandedTaskID = newValue ? task.id : nil
-                                                    }
+                            VStack(spacing: 0) {
+                                ForEach(Array(todayTasks.enumerated()), id: \.element.id) { index, task in
+                                    TaskRowCard(
+                                        task: task,
+                                        isExpanded: Binding(
+                                            get: { expandedTaskID == task.id },
+                                            set: { newValue in
+                                                withAnimation(.easeInOut(duration: 0.2)) {
+                                                    expandedTaskID = newValue ? task.id : nil
                                                 }
-                                            )
+                                            }
                                         )
-                                    }
-                                }
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.bottom, 24)
-                            
-                            // SwiftData 초기화 버튼
-                            VStack(spacing: 16) {
-                                Button(action: {
-                                    showingResetAlert = true
-                                }) {
-                                    HStack(spacing: 8) {
-                                        Image(systemName: "trash.circle.fill")
-                                            .foregroundColor(.red)
-                                            .font(.title2)
-                                        
-                                        Text("SwiftData 초기화")
-                                            .foregroundColor(.red)
-                                            .fontWeight(.semibold)
-                                    }
-                                    .padding(.vertical, 12)
-                                    .padding(.horizontal, 20)
-                                    .background(Color.red.opacity(0.1))
-                                    .cornerRadius(10)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .stroke(Color.red.opacity(0.3), lineWidth: 1)
                                     )
+                                    if index < todayTasks.count - 1 {
+                                        Divider()
+                                            .padding(.leading, 16)
+                                    }
                                 }
-                                
-                                Text("모든 저장된 작업 데이터가 삭제됩니다")
-                                    .font(.caption)
-                                    .foregroundColor(.neutral60)
-                                    .multilineTextAlignment(.center)
                             }
+                            .background(
+                                RoundedRectangle(cornerRadius: 12).fill(.white)
+                            )
                             .padding(.horizontal, 16)
-                            .padding(.bottom, 32)
+                            .padding(.bottom, 75)
+
+
                         }
                     }
                     
@@ -265,116 +179,90 @@ struct MainView: View {
     }
 }
 
-// MARK: - Task Row Card (접힘/펼침)
-private struct TaskRowCard: View {
-    let task: ConstructionTask
-    @Binding var isExpanded: Bool
-    
-    // 더미 체크리스트 (실제 항목 연결 전까지 임시)
-    private var sampleChecks: [(title: String, desc: String, done: Bool)] {
-        [
-            ("지하매설물 조사", "가스관, 상하수도관, 전기·통신케이블관 등의 매설 유무", true),
-            ("지하매설물 조사", "가스관, 상하수도관, 전기·통신케이블관 등의 매설 유무", true)
-        ]
-    }
-    
+// MARK: - LogoHeaderSection
+
+fileprivate struct LogoHeaderSection: View {
     var body: some View {
-        VStack(spacing: 0) {
-            // 상단 행
-            HStack(alignment: .top) {
-                // 좌측 상태 점 (리스크에 따라 색 조절 예시)
-                Circle()
-                    .fill(dotColor(for: task.riskScore))
-                    .frame(width: 10, height: 10)
-                
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(task.process) // 공정명
-                        .font(.h5)
-                        .foregroundStyle(.neutral100)
-                    
-                    Text(MainView.timeFormatter.string(from: task.startTime))
-                        .font(.b2)
-                        .foregroundStyle(.neutral60)
-                }
-                
-                Spacer()
-                
-                if isExpanded {
-                    Text("Done")
-                        .font(.labelM)
-                        .foregroundStyle(.blue60)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(
-                            Capsule().fill(Color.blue5)
-                        )
-                        .onTapGesture {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                isExpanded = false     // 접기
-                            }
-                        }
-                } else {
-                    // 진행 개수 배지 (샘플: "2 / 3" 같은 모양)
-                    let progressNumerator = max(1, task.progressRate / 40)
-                    let progressDenominator = max(1, task.progressRate / 30)
-                    Text("\(progressNumerator) / \(progressDenominator)")
-                        .font(.b2)
-                        .foregroundStyle(.neutral80)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(
-                            Capsule().fill(Color.neutral10)
-                        )
-                }
-            }
-            .contentShape(Rectangle()) // 탭 영역 확장
-            .onTapGesture {
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    isExpanded.toggle()
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 14)
-            .padding(.bottom, isExpanded ? 10 : 14)
-            
-            // 펼친 내용
-            if isExpanded {
-                VStack(spacing: 20) {
-                    ForEach(Array(sampleChecks.enumerated()), id: \.offset) { _, item in
-                        HStack(alignment: .top, spacing: 12) {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(item.title)
-                                    .font(.labelM)
-                                    .foregroundStyle(.neutral100)
-                                Text(item.desc)
-                                    .font(.b2)
-                                    .foregroundStyle(.neutral70)
-                            }
-                            Spacer()
-                            Image(systemName: "checkmark.square.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 22, height: 22)
-                                .foregroundStyle(.blue60)
-                        }
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 16)
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-        }
-        
-        .background(
-            RoundedRectangle(cornerRadius: 12).fill(Color.neutral10)
-        )
-    }
-    
-    private func dotColor(for score: Int) -> Color {
-        switch score {
-        case 0..<40:  return .green
-        case 40..<70: return .yellow
-        default:      return .red
-        }
+        Image(.textLogo)
+            .scaledToFit()
+            .frame(height: 30)
+            .padding(.leading, 20)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
+
+// MARK: - Risk Score Section (오늘의 리스크 카드)
+
+fileprivate struct RiskScoreSection: View {
+    let topThree: [ConstructionTask]
+    let averageRisk: Int
+    let onTap: () -> Void
+    
+    var body: some View {
+        HStack(spacing: 20) {
+            VStack(spacing: 29) {
+                Text("Tasks to watch")
+                    .font(.labelM)
+                    .foregroundStyle(.neutral70)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                VStack(spacing: 4) {
+                    // 1등
+                    HStack {
+                        Text("1. ")
+                            .font(.b1)
+                            .foregroundStyle(.neutral100)
+                        +
+                        Text(topThree.first?.process ?? "Concrete pour")
+                            .font(.b1)
+                            .foregroundStyle(.neutral100)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    // 2등
+                    HStack {
+                        Text("2. ")
+                            .font(.b1)
+                            .foregroundStyle(.neutral100)
+                        +
+                        Text(topThree.dropFirst().first?.process ?? "rebar, tie-in")
+                            .font(.b1)
+                            .foregroundStyle(.neutral100)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+            .padding(.vertical, 24)
+            .padding(.leading, 24)
+            
+            Rectangle()
+                .frame(width: 1, height: 98)
+                .foregroundStyle(.neutral20)
+            
+            VStack(spacing: 43) {
+                Text("Today’s Risk Score")
+                    .font(.labelM)
+                    .foregroundStyle(.neutral70)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                HStack(alignment: .bottom, spacing: 4) {
+                    Text("\(averageRisk)")
+                        .font(.pretendard(type: .medium, size: 48))
+                        .foregroundStyle(.neutral100)
+                    
+                    Text("pts")
+                        .font(.h4)
+                        .foregroundStyle(.neutral100)
+                }
+            }
+            .padding(.vertical, 24)
+            .padding(.trailing, 24)
+        }
+        .background {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.neutral0)
+        }
+        .onTapGesture { onTap() }
+    }
+}
+
