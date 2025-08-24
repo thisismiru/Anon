@@ -90,9 +90,8 @@ struct ProcessAddView: View {
                 NavigationBar(style: .simpleBack, onBack: { goBack() })
             }
             
-            VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 0) {
                 VStack(alignment: .leading, spacing: 50) {
-                    // ── 고정 헤더(변하지 않음) ───────────────────────────────
                     VStack(alignment: .leading, spacing: 8) {
                         Text(step.title)
                             .font(.h3)
@@ -100,7 +99,7 @@ struct ProcessAddView: View {
                             .font(.b1)
                             .foregroundStyle(.secondary)
                     }
-                    .safeAreaPadding(.horizontal, 16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     
                     // ── 아래 컨텐츠만 단계에 따라 교체 ─────────────────────
                     ZStack {
@@ -131,28 +130,28 @@ struct ProcessAddView: View {
                         
                     }
                     
-                    Spacer()
                     
-                    // ── 하단 버튼(이전/다음) ───────────────────────────────
-                    
-                    NextButton(
-                        buttonType: step == .workProgress && !(taskId?.isEmpty ?? true) ? .save : (step == .addTask ? .start : .next),
-                        //삼항 연산자
-                        // 프로그레스 스탭에서 기존 아이디가 있으면 저장하기(수정버튼)
-                        buttonStyle: canNext ? .enabled : .disabled
-                    ) {
-                        withAnimation { goNext() }
-                    }
-                    .safeAreaPadding(.horizontal, 16)
                 }
-                .safeAreaPadding(.top, step == .workType ? 84 : 0)
-                .safeAreaPadding(.bottom, 12)
+                
+                Spacer()
+                
+                // ── 하단 버튼(이전/다음) ───────────────────────────────
+                
+                NextButton(
+                    buttonType: step == .workProgress && !(taskId?.isEmpty ?? true) ? .save : (step == .addTask ? .start : .next),
+                    //삼항 연산자
+                    // 프로그레스 스탭에서 기존 아이디가 있으면 저장하기(수정버튼)
+                    buttonStyle: canNext ? .enabled : .disabled
+                ) {
+                    withAnimation { goNext() }
+                }
+                
             }
             .onAppear {
                 guard let idString = taskId, let id = UUID(uuidString: idString) else { return }
                 task = container.taskRepository.fetchTask(by: id)
             }
-            
+            .safeAreaPadding(.horizontal, 16)
             .safeAreaPadding(.top, step == .workType ? 84 : 0)
             .safeAreaPadding(.bottom, 12)
         }
@@ -295,10 +294,10 @@ struct ProcessAddView: View {
             print("✅ 작업 저장 성공! 위험도: \(predictedRiskScore)점")
             print("📅 시작 시간: \(startTime)")
             
-            // 테스크 저장 완료 후 메인 화면으로 이동
-            DispatchQueue.main.async {
-                appFlowViewModel.appState = .main
-            }
+//            // 테스크 저장 완료 후 메인 화면으로 이동
+//            DispatchQueue.main.async {
+//                appFlowViewModel.appState = .main
+//            }
         } catch {
             print("❌ Save error: \(error)")
         }

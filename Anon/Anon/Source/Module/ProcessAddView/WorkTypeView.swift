@@ -47,7 +47,7 @@ struct WorkTypeView: View {
                 .animation(.spring(response: 0.25, dampingFraction: 0.9), value: selectedMedium)
             }
         }
-        .padding(20)
+//        .padding(20)
 
         // 내부 → 외부 동기화
         .onChange(of: selectedLarge)  { _, new in selectedLargeType = new }
