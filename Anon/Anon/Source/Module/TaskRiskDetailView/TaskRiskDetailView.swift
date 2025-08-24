@@ -53,49 +53,6 @@ struct TaskRiskDetailView: View {
                     Spacer()
                         .frame(height: 51)
                     
-                    // 최적 작업 시간 추천
-                    VStack(spacing: 12) {
-                        Text("최적 작업 시간 추천")
-                            .font(.h4)
-                            .foregroundStyle(.neutral100)
-                        
-                        HStack(spacing: 16) {
-                            VStack(spacing: 4) {
-                                Text("\(optimalWorkTime.startTime):00")
-                                    .font(.title2)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.neutral100)
-                                Text("시작")
-                                    .font(.caption)
-                                    .foregroundStyle(.neutral60)
-                            }
-                            
-                            Text("-")
-                                .font(.title2)
-                                .foregroundStyle(.neutral60)
-                            
-                            VStack(spacing: 4) {
-                                Text("\(optimalWorkTime.endTime):00")
-                                    .font(.title2)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.neutral100)
-                                Text("종료")
-                                    .font(.caption)
-                                    .foregroundStyle(.neutral60)
-                            }
-                        }
-                        
-                        Text(optimalWorkTime.reason)
-                            .font(.caption)
-                            .foregroundStyle(.neutral80)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 16)
-                    }
-                    .padding(.vertical, 16)
-                    .padding(.horizontal, 20)
-                    .background(Color.blue.opacity(0.1))
-                    .cornerRadius(12)
-                    
                     Spacer()
                         .frame(height: 30)
                     

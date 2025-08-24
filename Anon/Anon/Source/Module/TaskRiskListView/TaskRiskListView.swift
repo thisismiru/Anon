@@ -66,11 +66,6 @@ struct TaskRiskListView: View {
                         }
                     }
                     
-//                    PlusButton(action:{container.navigationRouter.push(to: .processAddView(taskId: ""))}
-//                    )
-//                    .frame(width: 56, height: 56)
-//                    .padding(.trailing, 16)
-//                    .safeAreaPadding(.bottom, 34)
                 }
             }
             .padding(.top, 50)

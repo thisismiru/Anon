@@ -26,9 +26,9 @@ struct RiskGraphView: View {
                         }
                         Spacer()
                     }
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, 12)
                     
-                        HStack(alignment: .bottom, spacing: 28) {
+                        HStack(alignment: .bottom, spacing: 20) {
                             ForEach(data) { item in
                                 RiskBarView(
                                     item: item,
@@ -42,7 +42,7 @@ struct RiskGraphView: View {
                         Rectangle()
                             .fill(.neutral30)
                             .frame(height: 2)
-                            .padding(.horizontal, 16)
+                            .padding(.horizontal, 12)
                             .padding(.bottom, 25)
                 }
             }
@@ -60,15 +60,15 @@ struct RiskBarView: View {
     let isMin: Bool
     
     var body: some View {
-        VStack(spacing: 19) {
+        VStack(spacing: 16) {
             ZStack(alignment: .bottom) {
                 if isMin {
                     BestMarker()
                 }
                 
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: 4)
                     .fill(barColor)
-                    .frame(width: 20, height: CGFloat(item.score) * 2)
+                    .frame(width: 24, height: CGFloat(item.score))
             }
             
             if item.hour % 3 == 0 {
@@ -81,6 +81,7 @@ struct RiskBarView: View {
                     .foregroundColor(.clear)
             }
         }
+        .padding(.horizontal, 2)
     }
     
     private var barColor: Color {
@@ -102,7 +103,6 @@ struct BestMarker: View {
         VStack(spacing: 0) {
             Text("Best")
                 .font(.b2)
-                .padding(.horizontal, 16)
                 .padding(.vertical, 4)
                 .background(Color.neutral70)
                 .cornerRadius(20)
