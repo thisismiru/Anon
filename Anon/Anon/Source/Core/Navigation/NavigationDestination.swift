@@ -8,7 +8,7 @@
 import Foundation
 
 enum NavigationDestination: Equatable, Hashable {
-    case processAddView(taskId: String)
+    case processAddView(taskId: String?, step: OnboardingStep?)
     case mainView
     case taskRiskListView
     case taskRiskDetailView(taskId: String)

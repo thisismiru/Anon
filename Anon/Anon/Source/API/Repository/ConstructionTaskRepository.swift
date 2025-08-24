@@ -88,6 +88,7 @@ final class ConstructionTaskRepository {
                     subcategory: String? = nil,
                     process: String? = nil,
                     workers: Int? = nil,
+                    startTime: Date? = nil,
                     progressRate: Int? = nil,
                     riskScore: Int? = nil) {
         if let category = category {
@@ -105,11 +106,13 @@ final class ConstructionTaskRepository {
         if let progressRate = progressRate {
             task.progressRate = progressRate
         }
+        if let startTime = startTime {
+            task.startTime = startTime
+        }
         if let riskScore = riskScore {
             task.riskScore = riskScore
         }
         try? context.save()
-        print("✅ Task updated: id=\(task.id), category=\(task.category), subcategory=\(task.subcategory), process=\(task.process), workers=\(task.workers), progressRate=\(task.progressRate), riskScore=\(task.riskScore)")
     }
     
     /// 특정 작업(Task)을 삭제합니다.

@@ -14,6 +14,7 @@ struct EditTaskView: View {
     
     @State private var task: ConstructionTask?
     @State private var showEditSheet = false
+    @State private var editStep: OnboardingStep = .workType
     let taskId: String?
     
     var body: some View {
@@ -22,24 +23,28 @@ struct EditTaskView: View {
                 if let task = task {
                     VStack(spacing: 16) {
                         Button {
+                            editStep = .workProcess
                             showEditSheet = true
                         } label: {
                             WorkDetailRow(label: "Work Process", value: "\(task.process)", type: .purple)
                         }
 
                         Button {
+                            editStep = .workProgress
                             showEditSheet = true
                         } label: {
                             WorkDetailRow(label: "Work Progress", value: "\(task.progressRate)%", type: .purple)
                         }
 
                         Button {
+                            editStep = .headcount
                             showEditSheet = true
                         } label: {
                             WorkDetailRow(label: "Number of Workers", value: "\(task.workers) workers", type: .purple)
                         }
 
                         Button {
+                            editStep = .startTime
                             showEditSheet = true
                         } label: {
                             WorkDetailRow(label: "Start Time", value: "\(task.startTime.toHourMinuteAmPm())", type: .purple)
@@ -61,7 +66,7 @@ struct EditTaskView: View {
                 task = container.taskRepository.fetchTask(by: id)
             }
             .sheet(isPresented: $showEditSheet) {
-                ProcessAddView(taskId: self.taskId)
+                ProcessAddView(taskId: self.taskId, step: editStep)
                     .environmentObject(container)
             }
             .navigationTitle("Edit")
@@ -77,8 +82,6 @@ struct EditTaskView: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
-                        // TODO: - 저장 로직 (예: Repository update)
-                        
                         dismiss()
                     }
                 }

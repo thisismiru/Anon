@@ -81,6 +81,10 @@ struct ProcessAddView: View {
         }
     }
 
+    init(taskId: String?, step: OnboardingStep? = .workType) {
+        self.taskId = taskId
+        _step = State(initialValue: step ?? .workType)
+    }
     
     var body: some View {
         
@@ -131,6 +135,17 @@ struct ProcessAddView: View {
                     }
                     
                     
+                    // ── 하단 버튼(이전/다음) ───────────────────────────────
+                    
+                    NextButton(
+                        buttonType: step != .workType && !(taskId?.isEmpty ?? true) ? .save : (step == .addTask ? .start : .next),
+                        //삼항 연산자
+                        // 기존 아이디가 있으면 저장하기(수정버튼)
+                        buttonStyle: canNext ? .enabled : .disabled
+                    ) {
+                        withAnimation { goNext() }
+                    }
+                    .safeAreaPadding(.horizontal, 16)
                 }
                 
                 Spacer()
@@ -148,8 +163,17 @@ struct ProcessAddView: View {
                 
             }
             .onAppear {
-                guard let idString = taskId, let id = UUID(uuidString: idString) else { return }
-                task = container.taskRepository.fetchTask(by: id)
+                guard let idString = taskId,
+                      let id = UUID(uuidString: idString),
+                      let fetchedTask = container.taskRepository.fetchTask(by: id)
+                else { return }
+                
+                self.task = fetchedTask
+
+                self.selectedProcess = WorkProcess.from(fetchedTask.process)
+                self.headcount = fetchedTask.workers
+                self.startTime = fetchedTask.startTime
+                self.progress = fetchedTask.progressRate
             }
             .safeAreaPadding(.horizontal, 16)
             .safeAreaPadding(.top, step == .workType ? 84 : 0)
@@ -159,23 +183,64 @@ struct ProcessAddView: View {
     
     // MARK: - Navigation
     private func goNext() {
-        if step == .workProgress, let id = taskId, !id.isEmpty {
-            guard
-                let large = selectedLargeType,
-                let medium = selectedWorkType,
-                let process = selectedProcess
-            else { return }
+        if let id = taskId, !id.isEmpty {
+            guard let id = taskId, !id.isEmpty, let task = task else { return }
             
-            if let task = task {
+            var updatedCategory: String? = nil
+            var updatedSubcategory: String? = nil
+            var updatedProcess: String? = nil
+            var updatedProgressRate: Int? = nil
+            var updatedWorkers: Int? = nil
+            var updatedStartTime: Date? = nil
+            
+            // 카테고리
+            if let large = selectedLargeType, large.largeWork != task.category {
+                updatedCategory = large.largeWork
+            }
+            
+            // 소분류
+            if let medium = selectedWorkType, medium != task.subcategory {
+                updatedSubcategory = medium
+            }
+            
+            // 프로세스
+            if let process = selectedProcess, process.title != task.process {
+                updatedProcess = process.title
+            }
+            
+            // 인원수
+            if let workers = headcount, workers != task.workers {
+                updatedWorkers = workers
+            }
+            
+            // 진행률
+            if progress != task.progressRate {
+                updatedProgressRate = progress
+            }
+            
+            // 시작시간
+            if startTime != task.startTime {
+                updatedStartTime = startTime
+            }
+            
+            if updatedCategory != nil ||
+                updatedSubcategory != nil ||
+                updatedProcess != nil ||
+                updatedProgressRate != nil ||
+                updatedWorkers != nil ||
+                updatedStartTime != nil {
                 container.taskRepository.updateTask(
                     task,
-                    category: large.largeWork,
-                    subcategory: medium,
-                    process: process.title,
-                    progressRate: progress
+                    category: updatedCategory ?? task.category,
+                    subcategory: updatedSubcategory ?? task.subcategory,
+                    process: updatedProcess ?? task.process,
+                    workers: updatedWorkers ?? task.workers,
+                    startTime: updatedStartTime ?? task.startTime,
+                    progressRate: updatedProgressRate ?? task.progressRate
                 )
-                dismiss()
             }
+            
+            dismiss()
         }
         
         
