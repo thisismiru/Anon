@@ -119,6 +119,24 @@ enum WorkType: CaseIterable {
         case .dam: return "댐"
         }
     }
+    
+    var largeWorkEnglish: String {
+        switch self {
+        case .building: return "Building"
+        case .water: return "Water"
+        case .road: return "Road"
+        case .misc: return "Misc"
+        case .bridge: return "Bridge"
+        case .river: return "River"
+        case .tunnel: return "Tunnel"
+        case .rail: return "Rail"
+        case .port: return "Port"
+        case .retaining: return "Retaining"
+        case .enviro: return "Enviro"
+        case .plant: return "Plant"
+        case .dam: return "Dam"
+        }
+    }
 
     /// Short subcategories (한국어로 통일 - CSV와 일치)
     var mediumWork: [String] {
@@ -156,6 +174,44 @@ enum WorkType: CaseIterable {
             return ["석유화학공장", "제철공장"]
         case .dam:
             return ["용수전용댐", "기타", "다목적댐", "홍수전용댐"]
+        }
+    }
+    
+    var mediumWorkEnglish: [String] {
+        switch self {
+        case .building:
+            return [
+                "Apartment", "Factory", "Office", "School", "Retail",
+                "Warehouse", "Misc", "Hall", "Hotel",
+                "House", "Military", "Stadium"
+            ]
+        case .water:
+            return ["Sewer", "Water", "Misc"]
+        case .road:
+            return ["Road", "Misc"]
+        case .misc:
+            return ["SitePrep", "Pipe"]
+        case .bridge:
+            return ["RoadBridge", "Misc", "RailBridge", "Cover"]
+        case .river:
+            return ["Levee", "Channel", "Pump", "Gate", "Weir"]
+        case .tunnel:
+            return ["RailTunnel", "RoadTunnel", "Misc", "Underpass"]
+        case .rail:
+            return ["Metro", "Railway", "Misc"]
+        case .port:
+            return ["Misc", "Breakwater", "Berth", "Revetment", "Lock", "Pier"]
+        case .retaining:
+            return ["Wall", "Slope", "Misc"]
+        case .enviro:
+            return [
+                "Sewage", "PollutionCtrl", "Incinerator",
+                "TestPlant", "WastePlant", "Reuse"
+            ]
+        case .plant:
+            return ["Petrochem", "Steel"]
+        case .dam:
+            return ["WaterDam", "Misc", "MultiDam", "FloodDam"]
         }
     }
 }
