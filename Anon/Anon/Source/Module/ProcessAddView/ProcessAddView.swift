@@ -134,6 +134,7 @@ struct ProcessAddView: View {
                         
                     }
                     
+                    Spacer()
                     
                     // ── 하단 버튼(이전/다음) ───────────────────────────────
                     
