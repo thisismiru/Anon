@@ -18,11 +18,19 @@ struct WorkTypeView: View {
     private var visibleLarge: [WorkType] {
         selectedLarge.map { [$0] } ?? WorkType.allCases
     }
-    private var visibleMedium: [String] {
+    // ⬇️ 한국어/영어 쌍으로 변경
+    private var visibleMedium: [(ko: String, en: String)] {
         guard let s = selectedLarge else { return [] }
-        return selectedMedium.map { [$0] } ?? s.mediumWork
-    }
+        let ko = s.mediumWork
+        let en = s.mediumWorkEnglish
 
+        // 특정 medium을 선택했으면 그 한 개만 보여주고, 아니면 전체 보여주기
+        if let sel = selectedMedium, let idx = ko.firstIndex(of: sel), idx < en.count {
+            return [(ko[idx], en[idx])]
+        } else {
+            return Array(zip(ko, en))
+        }
+    }
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Large
@@ -38,8 +46,8 @@ struct WorkTypeView: View {
             // Medium
             if selectedLarge != nil {
                 FlowLayout(spacing: 12) {
-                    ForEach(visibleMedium, id: \.self) { medium in
-                        chipMedium(medium)
+                    ForEach(visibleMedium, id: \.ko) { pair in
+                        chipMedium(titleKO: pair.ko, displayEN: pair.en)
                             .transition(.asymmetric(insertion: .scale.combined(with: .opacity),
                                                     removal: .opacity.combined(with: .scale)))
                     }
@@ -86,7 +94,7 @@ struct WorkTypeView: View {
             }
         } label: {
             HStack(spacing: 8) {
-                Text(type.largeWork)
+                Text(type.largeWorkEnglish)
                     .font(.b1)
                     .foregroundStyle(isSelected ? .blue80 : .neutral70)
                 if isSelected { Image(.workXIcon) }
@@ -103,17 +111,17 @@ struct WorkTypeView: View {
         .buttonStyle(.plain)
     }
 
-    private func chipMedium(_ title: String) -> some View {
-        let isSelected = (selectedMedium == title)
+    private func chipMedium(titleKO: String, displayEN: String) -> some View {
+        let isSelected = (selectedMedium == titleKO)
         return Button {
             withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                let newValue = isSelected ? nil : title
+                let newValue: String? = isSelected ? nil : titleKO   // 저장/바인딩은 KO
                 selectedMedium   = newValue
                 selectedWorkType = newValue
             }
         } label: {
             HStack(spacing: 8) {
-                Text(title)
+                Text(displayEN)                                      // 화면 표시만 EN
                     .font(.b1)
                     .foregroundStyle(isSelected ? .blue80 : .neutral70)
                 if isSelected { Image(.workXIcon) }
