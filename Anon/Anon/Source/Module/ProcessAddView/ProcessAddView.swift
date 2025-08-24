@@ -148,19 +148,6 @@ struct ProcessAddView: View {
                     .safeAreaPadding(.horizontal, 16)
                 }
                 
-                Spacer()
-                
-                // ── 하단 버튼(이전/다음) ───────────────────────────────
-                
-                NextButton(
-                    buttonType: step == .workProgress && !(taskId?.isEmpty ?? true) ? .save : (step == .addTask ? .start : .next),
-                    //삼항 연산자
-                    // 프로그레스 스탭에서 기존 아이디가 있으면 저장하기(수정버튼)
-                    buttonStyle: canNext ? .enabled : .disabled
-                ) {
-                    withAnimation { goNext() }
-                }
-                
             }
             .onAppear {
                 guard let idString = taskId,
