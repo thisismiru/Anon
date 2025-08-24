@@ -41,11 +41,12 @@ struct AddTaskView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 10) {
-                ForEach(tasks) { task in
-                    TaskCard(task: task)
+            VStack(spacing: 30) {
+                VStack(spacing: 10) {
+                    ForEach(tasks) { task in
+                        TaskCard(task: task)
+                    }
                 }
-                .padding(.bottom, 20)
 
                 // + 버튼 (추가 액션은 원하는 동작으로 연결)
                 Button {
@@ -61,11 +62,7 @@ struct AddTaskView: View {
                     }
                     .frame(width: 48, height: 48)
                 }
-                .padding(.top, 24)
-                .padding(.bottom, 40)
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
         }
     }
 }
@@ -81,7 +78,7 @@ fileprivate struct TaskCard: View {
     }
 
     var body: some View {
-        HStack(alignment: .top) {
+        HStack() {
             VStack(alignment: .leading, spacing: 7) {
                 // 상단 타이틀: 공정/프로세스 (원하는 조합으로 표기)
                 Text(task.process) // 예: "마감, 도장"

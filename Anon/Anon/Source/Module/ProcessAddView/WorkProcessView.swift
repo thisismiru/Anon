@@ -25,7 +25,6 @@ struct WorkProcessView: View {
                 }
             }
         }
-        .padding(.horizontal, 16)
     }
 
     @ViewBuilder
