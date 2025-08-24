@@ -68,7 +68,7 @@ struct RiskBarView: View {
                 
                 RoundedRectangle(cornerRadius: 4)
                     .fill(barColor)
-                    .frame(width: 24, height: CGFloat(item.score))
+                    .frame(width: 24, height: CGFloat(item.score) * 2)
             }
             
             if item.hour % 3 == 0 {
@@ -87,10 +87,6 @@ struct RiskBarView: View {
     private var barColor: Color {
         if isMin {
             return .success
-        }
-        
-        if isSelected {
-            return .blue20
         }
         
         return .neutral20
